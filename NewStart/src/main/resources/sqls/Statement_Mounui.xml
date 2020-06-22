@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.mounui">
+
+<resultMap type="MDto" id="getAdminBoard">
+   <result column="mounui_seq" property="mounui_seq"/>
+   <result column="user_seq" property="user_seq"/>
+   <result column="user_email" property="board_code"/>
+   <result column="user_nickname" property="category_seq"/>
+   <result column="category_title" property="category_title"/>
+   <result column="title" property="title"/>
+   <result column="content" property="content"/>
+   <result column="regdate" property="regdate"/>
+   <result column="replychk" property="replychk"/>
+   <result column="filechk" property="filechk"/>
+   <result column="delchk" property="delchk"/>
+</resultMap>
+
+<resultMap type="EmailDto" id="replydto">
+   <result column="title" property="email_title"/>
+   <result column="content" property="email_content"/>
+   <result column="successchk" property="successchk"/>
+   <result column="regdate" property="regdate"/>
+</resultMap>
+
+
+<!-- 문의 게시판 -->
+
+<!-- 문의글 등록하기 -->
+<insert id="insertBoard" parameterType="MDto">
+ INSERT INTO MOUNUI
+(BOARD_CODE, USER_SEQ, CATEGORY_SEQ, TITLE, CONTENT, REGDATE, REPLYCHK, FILECHK, DELCHK)
+VALUES('3000', #{user_seq}, #{category_seq}, #{title}, #{content}, NOW() , 'N', #{filechk}, 'N')
+
+ <selectKey order="AFTER" resultType="java.lang.String" keyProperty="mounui_seq">
+    SELECT MAX(`MOUNUI_SEQ`) AS MOUNUI_SEQ FROM MOUNUI
+ </selectKey>
+
+</insert>
+<!-- ok -->
+
+
+<!-- 회원번호로 문의글 갯수 가져오기 -->
+<select id="getUserMounuiBoard" parameterType="java.lang.String" resultType="java.lang.String">
+SELECT COUNT(*) FROM MOUNUI m WHERE USER_SEQ = #{user_seq} AND DELCHK = 'N'
+</select>
+<!-- OK -->
+
+<!--회원번호로 문의글 정보 가져오기-->
+ <select id="userBoard" parameterType="java.util.Map" resultType="MDto">
+ SELECT  M.CATEGORY_TITLE, M.MOUNUI_SEQ, M.TITLE,
+  M.CONTENT, M.REGDATE , M.REPLYCHK
+FROM 
+   (SELECT  fc.CATEGORY_TITLE, MOUNUI_SEQ, 
+  CASE WHEN LENGTH(TITLE)>10 THEN CONCAT(SUBSTR(TITLE,1,10),'....') ELSE TITLE END AS TITLE,
+  CONTENT, DATE_FORMAT(REGDATE,'%Y-%m-%d') AS REGDATE , REPLYCHK, @ROWNUM := @ROWNUM + 1 AS RNUM  
+   FROM  (SELECT @ROWNUM := 0) r, MOUNUI m, FAQ_CODE fc 
+    where m.CATEGORY_SEQ = fc.CATEGORY_SEQ 
+     AND USER_SEQ = #{user_seq} AND DELCHK = 'N') M
+     order by RNUM desc limit ${start},${last}
+ </select>
+ <!-- ok -->
+ 
+ 
+ <!--SEQ로 문의글 상세조회 -->
+ <select id="userBoardDetail" parameterType="java.lang.String" resultType="MDto">
+ SELECT MOUNUI_SEQ, f.CATEGORY_TITLE ,TITLE, CONTENT, DATE_FORMAT(REGDATE,'%Y-%m-%d') AS REGDATE , REPLYCHK, FILECHK 
+  FROM MOUNUI m JOIN FAQ_CODE f ON m.CATEGORY_SEQ = f.CATEGORY_SEQ 
+      AND BOARD_CODE = '3000' AND MOUNUI_SEQ = #{mounui_seq} AND DELCHK = 'N'
+ </select>
+  <!-- ok -->
+  
+  
+ <!--글 seq로 문의글 정보 수정하기-->
+<update id="updateBoard" parameterType="MDto">
+UPDATE MOUNUI 
+ SET CATEGORY_SEQ = #{category_seq}, TITLE = #{title}, CONTENT = #{content},
+    REGDATE = SYSDATE, FILECHK = #{filechk}
+         WHERE MOUNUI_SEQ = #{mounui_seq}
+</update>
+  
+<!--글 seq로 문의글 삭제여부 y로 변경하기 -->
+<update id="delBoard" parameterType="java.util.Map">
+ UPDATE MOUNUI 
+ SET DELCHK = 'Y'
+ <where>
+ MOUNUI_SEQ IN
+   <foreach collection="seq" item="seq" open="(" close=")" separator=",">
+      #{seq}
+   </foreach>
+ </where>
+</update>
+<!--ok  -->
+
+
+
+<!-- 전체 글 갯수 세기  -->
+<select id="getAdminMounuiCnt" parameterType="FilterDto" resultType="java.lang.String">
+SELECT  COUNT(*)
+   FROM MOUNUI m NATURAL JOIN USER u NATURAL JOIN FAQ_CODE
+   <if test="_parameter != null">
+      <include refid="filter"/>
+      </if>
+</select>
+<!--OK  -->
+
+ 
+ <!--전체 글 가져오기(삭제된 것까지)-->
+<select id="adminBoard" parameterType="FilterDto" resultMap="getAdminBoard">
+SELECT  RNUM,M.MOUNUI_SEQ,  M.CATEGORY_TITLE, M.USER_SEQ, M.USER_EMAIL, M.USER_NICKNAME,M.TITLE,M.REGDATE, M.REPLYCHK, M.FILECHK, M.DELCHK  
+    FROM (SELECT MOUNUI_SEQ, CATEGORY_TITLE, USER_SEQ, USER_EMAIL, USER_NICKNAME,
+       CASE WHEN LENGTH(TITLE)>10 THEN CONCAT(SUBSTR(TITLE,1,10),'....') ELSE TITLE END AS TITLE,
+       REGDATE, REPLYCHK, FILECHK, DELCHK, @ROWNUM := @ROWNUM + 1 AS RNUM  
+          FROM MOUNUI m NATURAL JOIN USER u NATURAL JOIN FAQ_CODE,(SELECT @ROWNUM := 0) r
+<if test="_parameter != null">
+      <include refid="filter"/>
+      </if>
+ order by RNUM DESC) M limit ${start},${last}
+</select>
+<!--ok -->
+
+
+<!-- 필터 sql -->
+<sql id="filter">
+<where>
+         <if test="user_grade != null and user_grade != ''">
+             u.USER_GRADE = #{user_grade}
+         </if>
+         <if test="replychk != null and replychk != ''">
+            AND m.REPLYCHK = #{replychk}
+         </if>      
+         <if test="delchk != null and delchk != ''">
+            AND m.DELCHK  = #{delchk}
+         </if>
+         <if test="firstDate != null and firstDate != ''">
+              <![CDATA[AND REGDATE >= #{firstDate}]]>
+         </if>
+         <if test="lastDate != null and lastDate != ''">
+              <![CDATA[AND REGDATE <= #{lastDate}]]>
+         </if>
+         <if test="successchk != null and successchk.size > 0">
+            AND CATEGORY_TITLE IN
+            <foreach collection="successchk" item="category" open="(" separator="," close=")">
+               #{category}
+            </foreach>
+         </if>
+   </where>
+</sql>
+<!--ok  -->
+
+<!-- 글 상세조회-->
+<select id="adminBoardDetail" parameterType="java.lang.String" resultMap="getAdminBoard">
+ SELECT MOUNUI_SEQ, CATEGORY_TITLE,CONTENT, USER_SEQ, USER_EMAIL, USER_NICKNAME, 
+ TITLE,
+ REGDATE, REPLYCHK, FILECHK ,DELCHK  
+ FROM MOUNUI m NATURAL JOIN USER u NATURAL JOIN FAQ_CODE
+  WHERE  BOARD_CODE = '3000' AND MOUNUI_SEQ = #{mounui_seq}
+</select>
+<!-- ok -->
+
+<!-- 카테고리 타이틀들 가져오기 -->
+<select id="getTitle" resultType="java.lang.String">
+SELECT CATEGORY_TITLE FROM FAQ_CODE fc
+</select>
+<!-- OK -->
+
+
+
+<!-- 답변 가져오기 -->
+<select id="getReply" parameterType="java.lang.String" resultMap="replydto">
+SELECT TITLE, CONTENT, SUCCESSCHK, REGDATE FROM R_EMAIL re
+   WHERE MOUNUI_SEQ =#{mounui_seq}
+</select>
+<!--ok  -->
+
+<!-- seq로 답변처리여부 y로 수정 -->
+ <update id="replyMounui" parameterType="java.lang.String">
+    UPDATE MOUNUI SET REPLYCHK = 'Y' WHERE MOUNUI_SEQ = #{mounui_seq}
+ </update>
+ <!-- ok -->
+ 
+ 
+ <!--seq로 단일 삭제하기 -->
+<delete id="adminDelBoard" parameterType="java.util.Map">
+ DELETE FROM MOUNUI
+    <where>
+    MOUNUI_SEQ IN
+       <foreach collection="seq" item="seq" open="(" close=")" separator=",">
+           #{seq}
+       </foreach>
+    </where>
+</delete>
+<!-- ok -->
+
+
+<!-- 카테고리 가져오기 -->
+<select id="getCategory" resultType="FAQDto">
+SELECT CATEGORY_SEQ, CATEGORY_TITLE FROM FAQ_CODE fc
+   ORDER BY CATEGORY_SORT
+</select>
+<!-- ok -->
+
+
+
+
+
+</mapper>

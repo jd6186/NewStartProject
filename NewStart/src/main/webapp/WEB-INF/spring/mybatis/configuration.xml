@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.start.pro.dto.DTO_User" alias="UserDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Gonggi" alias="GongGiDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Gonggo" alias="GGDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Bidding" alias="BiddingDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_BWL" alias="BWL_Dto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Pay" alias="PayDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Credit" alias="CreditDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Refund_Pay" alias="RefundPayDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Refund_Credit" alias="RefundCreDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_File" alias="FileDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Email" alias="EmailDto"/>		
+		<typeAlias type="com.start.pro.security.Sc_User" alias="UserDetailsDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Filter" alias="FilterDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Mounui" alias="MDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_FAQ" alias="FAQDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_ChatRoom" alias="ChatRoomDto" />
+		<typeAlias type="com.start.pro.dto.DTO_ChatList" alias="ChatListDto" />
+		<typeAlias type="com.start.pro.dto.DTO_Push" alias="PushDto" />
+		<typeAlias type="com.start.pro.dto.DTO_Profile" alias="ProDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Career" alias="CarDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Review" alias="ReDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_SMS" alias="SMSDto"/>
+		<typeAlias type="com.start.pro.dto.DTO_Declaration" alias="DecDto"/>
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="/sqls/Statement_Login.xml"/>
+		<mapper resource="/sqls/Statement_Gonggi.xml"/>
+		<mapper resource="/sqls/Statement_Bidding_W_List.xml"/>
+		<mapper resource="/sqls/Statement_Bidding.xml"/>
+		<mapper resource="/sqls/Statement_Pay.xml"/>
+		<mapper resource="/sqls/Statement_Gongo.xml"/>
+		<mapper resource="/sqls/Statement_File.xml"/>
+		<mapper resource="/sqls/Statement_User.xml"/>
+		<mapper resource="/sqls/Statement_Email.xml"/>
+		<mapper resource="/sqls/Statement_Mounui.xml"/>
+		<mapper resource="/sqls/Statement_Chat.xml" />
+		<mapper resource="/sqls/Statement_Push.xml" />
+		<mapper resource="/sqls/Statement_Dec.xml"/>
+		<mapper resource="/sqls/Statement_Profile.xml"/>
+		<mapper resource="/sqls/Statement_Review.xml"/>
+		<mapper resource="/sqls/Statement_SMS.xml"/>
+	</mappers>
+
+</configuration>

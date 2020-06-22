@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+<!--************************************** DB 연결 **************************************-->
+
+
+	<!-- 1.properties 파일을 bean 등록 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:properties/db.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 2. 접속정보를 가지고 있는 객체 DataSource 작성 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${user}" />
+		<property name="password" value="${pw}" />
+		<property name="defaultAutoCommit" value="true" />
+	</bean>
+
+	<!-- 3. MyBatis의 SqlSessionFactory 객체를 Bean -->
+	<bean id="sqlSessionFactoryBean"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation"
+			value="/WEB-INF/spring/mybatis/configuration.xml" />
+	</bean>
+
+	<!-- 4. Spring에서 사용하는 Bean Autowired or Resource 통해서 사용하는 객체 -->
+	<bean id="sqlSessionTemplate"
+		class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactoryBean" />
+	</bean>
+
+	<!-- 5. Transaction처리할  transactionManager 만들기-->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 6. Transaction이 자동으로 동작되는 메소드 작성 -->
+	<!-- REQUIRED : 프로파게이션을 진행해 실행 시켜 하나라도 Exception 예외바 발생한다면 rollback을 진행하게 
+		하겠다는 뜻 -->
+	<tx:advice id="txAdvice"
+		transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED"
+				rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 7. Transaction을 AOP의 pointcut을 설정해주기 -->
+	<!-- service에서 dao조합해서 작성 할 것 -->
+	<aop:config>
+		<aop:advisor advice-ref="txAdvice"
+			pointcut="execution(public * com.start.pro.models.*.*.*(..))" />
+	</aop:config>
+
+
+
+<!--************************************** DB 연결 **************************************-->
+
+<bean id="diskFileItemFactory" class="org.apache.commons.fileupload.disk.DiskFileItemFactory">
+		<constructor-arg name="repository" value="D:\\atteches"/>
+		<constructor-arg name="sizeThreshold" value="41943040"/>
+		<!-- <property name="defaultCharset" value="utf-8"/> -->
+	</bean>
+	<bean class="org.apache.commons.fileupload.servlet.ServletFileUpload">
+		<property name="fileItemFactory" ref="diskFileItemFactory"/>
+	</bean>
+
+
+
+
+
+</beans>

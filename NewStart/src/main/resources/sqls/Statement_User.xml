@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.User">
+	<resultMap type="UserDto" id="UDto">
+		<result property="user_seq" column="user_seq"/>
+		<result property="user_email" column="user_email"/>
+		<result property="user_nickname" column="user_nickname"/>
+		<result property="user_name" column="user_name"/>
+		<result property="user_grade" column="user_grade"/>
+		<result property="user_type" column="user_type"/>
+		<result property="user_pw" column="user_pw"/>
+		<result property="user_phone" column="user_phone"/>
+		<result property="user_adchk" column="user_adchk"/>
+		<result property="user_regdate" column="user_regdate"/>
+		<result property="user_treq" column="user_treq"/>
+		<result property="user_tchk" column="user_tchk"/>
+		<result property="user_pchk" column="user_pchk"/>
+		<result property="tea_date" column="tea_date"/>
+		<result property="tea_handate" column="tea_handate"/>
+	</resultMap>
+
+	<!-- 회원 정보 전체 조회 -->
+	<select id="searchAll" resultType="UserDto">
+		SELECT USER_SEQ,USER_EMAIL ,USER_NAME
+			   ,USER_NICKNAME ,USER_GRADE ,USER_TYPE
+			   ,USER_ADCHK ,USER_TCHK,USER_REGDATE
+		FROM "USER"
+	</select>
+	
+	<select id="searchDetail" parameterType="java.lang.String" resultType="UserDto">
+		SELECT USER_SEQ,USER_EMAIL ,USER_NAME
+			   ,USER_NICKNAME ,USER_GRADE ,USER_TYPE,USER_PHONE
+			   ,USER_ADCHK ,USER_TREQ,USER_TCHK,TO_CHAR(USER_REGDATE,'YY-MM-DD HH24:MI:SS') USER_REGDATE
+		FROM "USER"
+		WHERE USER_SEQ = #{user_seq}
+	</select>
+	
+<!-- 	강사인증을 한 회원 등급 변경 -->
+	<update id="updateTeacher" parameterType="java.lang.Integer">
+		UPDATE "USER" SET USER_GRADE ='T' ,USER_TCHK='Y'
+		WHERE USER_SEQ =#{user_seq} AND USER_TCHK='N'
+	</update>
+	
+	
+	
+<!-- 	회원 유형 휴면으로 변경 -->
+	<update id="updateHuman" parameterType="java.lang.Integer">
+	UPDATE "USER" SET USER_TYPE ='H'
+	WHERE USER_SEQ IN (SELECT USER_SEQ 
+						FROM USER_LOG 
+						WHERE TRUNC(SYSDATE)-LAST_LOGIN >'365')
+	</update>
+
+<!-- 	비밀번호 수정 -->
+	<update id="updateMyPage" parameterType="UserDto">
+		UPDATE "USER" SET USER_NICKNAME=#{user_nickname},USER_PHONE=#{user_phone} WHERE USER_SEQ =#{user_seq}
+	</update>
+<!-- 	비밀번호 수정 -->
+	<update id="updatePw" parameterType="UserDto">
+		UPDATE "USER" SET USER_PW=#{user_pw} WHERE USER_SEQ =#{user_seq}
+	</update>
+	
+	
+<!-- 광고수신 동의 여부 수정 -->
+<!-- 	<update id="updateAdChk" parameterType="java.lang.Integer"> -->
+<!-- 		UPDATE "USER" SET -->
+<!-- 		<if test="user_adchk == N"> -->
+<!-- 		USER_ADCHK ='Y' WHERE USER_SEQ =#{user_seq} AND USER_ADCHK ='N' -->
+<!-- 		</if> -->
+<!-- 		<if test="user_adchk == Y"> -->
+<!-- 		USER_ADCHK ='N' WHERE USER_SEQ =#{user_seq} AND USER_ADCHK ='Y' -->
+<!-- 		</if> -->
+<!-- 	</update> -->
+	
+<!-- 	스위칭 기능 -->
+	<update id="updateGrade" parameterType="java.lang.Integer">
+		UPDATE "USER" SET 
+		<if test="user_grade == M">
+			USER_GRADE ='T'	
+		</if>
+		<if test="user_grade == T">
+			USER_GRADE ='M'	
+		</if>
+		WHERE USER_SEQ =#{user_seq} AND USER_TCHK ='Y'
+	</update>
+
+	<!-- 강사 요청 -->
+	<update id="teacherReq" parameterType="java.lang.String">
+		UPDATE "USER" SET USER_TREQ ='Y' WHERE USER_SEQ =#{user_seq}
+	</update>
+	<!-- 강사 요청한 시간 입력 -->
+	<insert id="tReqTime"  parameterType="java.lang.String">
+		INSERT INTO TEACHER_CHK(USER_SEQ) VALUES(#{user_seq})
+	</insert>
+	
+	<!-- 강사 인증 요청한 유저 전체 보기 -->
+	<select id="searchTReqAll" resultMap="UDto">
+		SELECT USER_SEQ,USER_EMAIL ,USER_NAME ,USER_NICKNAME,USER_REGDATE,
+			TO_CHAR(TEA_DATE,'YY-MM-DD HH24:MI:SS') TEA_DATE 
+		FROM "USER" NATURAL JOIN TEACHER_CHK
+		WHERE USER_TREQ ='Y' AND USER_TCHK ='N'
+	</select>
+	
+<!-- 	강사 인증 요청한 유저 상세 보기 -->
+	<!-- <select id="searchTReqDetail" parameterType="java.lang.String" resultType="UserDto">
+	SELECT USER_SEQ,USER_EMAIL ,USER_NAME ,USER_NICKNAME,USER_REGDATE,
+			TO_CHAR(TEA_DATE,'YY-MM-DD HH24:MI:SS') TEA_DATE ,
+				NVL(TEA_HANDATE,'확인중') 
+		FROM "USER" NATURAL JOIN TEACHER_CHK 
+		WHERE USER_TREQ ='Y' AND USER_TCHK ='N' AND USER_SEQ =#{user_seq}
+	</select> -->
+	
+	<!-- 강사 인증 허락하기 -->
+	<update id="teaRespY"  parameterType="java.lang.String">
+		UPDATE "USER" SET USER_TCHK ='Y' WHERE USER_SEQ=#{user_seq}
+	</update>
+	<!-- 강사 인증 거절하기 -->
+	<update id="teaRespN"  parameterType="java.lang.String">
+		UPDATE "USER" SET USER_TREQ ='N' WHERE USER_SEQ=#{user_seq}
+	</update>
+	
+	
+	<!-- 강사 인증 허락 시간  -->
+	<update id="tRespTime"  parameterType="java.lang.String">
+		UPDATE TEACHER_CHK SET TEA_HANDATE =SYSDATE WHERE USER_SEQ = #{user_seq}
+	</update>
+	
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

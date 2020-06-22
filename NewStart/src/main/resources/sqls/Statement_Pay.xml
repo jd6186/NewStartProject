@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.pay">
+
+<!-- 결제 생성 -->
+<insert id="createPay" parameterType="PayDto">
+INSERT INTO PAYMENT
+(PAY_TOKEN, PAY_ORDERNO, PAY_AMOUNT, PAY_DATE, USER_SEQ, DELREFUND)
+VALUES( #{pay_token}, #{pay_orderno}, #{pay_amount}, NOW(), #{user_seq}, #{delrefund})
+</insert>
+
+<!--  parameterType="com.start.pro.dto.DTO_Criteria" -->
+<!-- 결제내역 조회 -->
+<select id="selectPay" parameterType="java.util.Map" resultType="PayDto">
+SELECT A.PAY_SEQ, A.PAY_TOKEN, A.PAY_AMOUNT, date_format(A.PAY_DATE,'%Y-%m-%d') AS PAY_DATE, A.USER_SEQ, A.DELREFUND
+   FROM(
+         SELECT P.PAY_SEQ, P.PAY_TOKEN, P.PAY_AMOUNT, P.PAY_DATE, P.USER_SEQ, P.DELREFUND
+               , @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM PAYMENT P, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+      AND USER_SEQ = #{user_seq}
+      ORDER BY PAY_SEQ DESC
+</select>
+
+<!-- 결제 상세정보 가져오기 -->
+<select id="selectOnePay" parameterType="java.lang.Integer" resultType="PayDto">
+SELECT PAY_SEQ, PAY_TOKEN, PAY_AMOUNT, USER_SEQ, DELREFUND
+   FROM PAYMENT
+      WHERE PAY_SEQ = #{pay_seq}
+</select>
+
+<!-- 관리자 결제내역 조회 -->
+<select id="selectAdPay" parameterType="java.util.Map" resultType="PayDto">
+SELECT A.PAY_SEQ, A.PAY_TOKEN, A.PAY_AMOUNT, date_format(A.PAY_DATE,'%Y-%m-%d') AS PAY_DATE, A.USER_SEQ, A.DELREFUND
+   FROM(
+         SELECT P.PAY_SEQ, P.PAY_TOKEN, P.PAY_AMOUNT, P.PAY_DATE, P.USER_SEQ, P.DELREFUND,
+               @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM PAYMENT P, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+      ORDER BY PAY_SEQ DESC
+</select>
+
+<!-- 결제 게시물 총 갯수 -->
+<select id="listCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(PAY_SEQ)
+        FROM PAYMENT
+       WHERE PAY_SEQ > 0
+          AND USER_SEQ = #{user_seq}
+   ]]>
+</select>
+
+<!-- 관리자 결제 게시물 총 갯수 -->
+<select id="listAdCount" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(PAY_SEQ)
+        FROM PAYMENT
+       WHERE PAY_SEQ > 0
+   ]]>
+</select>
+<!-- 환불 게시물 총 갯수 -->
+<select id="refListCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(REFUND_SEQ)
+        FROM REFUND_PAYMENT
+       WHERE REFUND_SEQ > 0
+       AND USER_SEQ = #{user_seq}
+   ]]>
+</select>
+<!-- 관리자 환불 게시물 총 갯수 -->
+<select id="refListAdCount" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(REFUND_SEQ)
+        FROM REFUND_PAYMENT
+       WHERE REFUND_SEQ > 0
+   ]]>
+</select>
+<!-- 크레딧 게시물 총 갯수 -->
+<select id="creListCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(CREDIT_SEQ)
+        FROM CREDIT
+       WHERE CREDIT_SEQ > 0
+       AND USER_SEQ = #{user_seq}
+   ]]>
+</select>
+
+<!-- 결제 주문번호 구하는 쿼리 -->
+<select id="selectMax" parameterType="java.lang.String" resultType="java.lang.Integer">
+SELECT MAX(PAY_ORDERNO)
+   FROM PAYMENT
+</select>
+
+<!-- 결제 환불 -->
+<insert id="refundPay" parameterType="RefundPayDto">
+INSERT INTO REFUND_PAYMENT 
+(REFUND_DATE, USER_SEQ, PAY_SEQ)
+VALUES(NOW(), #{user_seq}, #{pay_seq})
+</insert>
+<!-- 결제 환불여부 고치기 -->
+<update id="updateRef" parameterType="java.lang.Integer">
+   UPDATE PAYMENT
+      SET DELREFUND = 'N'
+         WHERE PAY_SEQ = #{pay_seq}
+</update>
+
+<!-- 환불내역 조회 -->
+<select id="selectRef" parameterType="java.util.Map" resultType="RefundPayDto">
+SELECT A.REFUND_SEQ, date_format(A.REFUND_DATE,'%Y-%m-%d') AS REFUND_DATE, A.PAY_SEQ, A.USER_SEQ
+   FROM(
+         SELECT E.REFUND_SEQ, E.REFUND_DATE, E.PAY_SEQ, E.USER_SEQ,
+               @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM REFUND_PAYMENT E, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+      AND USER_SEQ = #{user_seq}
+
+</select>
+<!-- 관리자 환불내역 조회 -->
+<select id="selectAdRef" parameterType="java.util.Map" resultType="RefundPayDto">
+SELECT A.REFUND_SEQ, date_format(A.REFUND_DATE,'%Y-%m-%d') AS REFUND_DATE, A.PAY_SEQ, A.USER_SEQ
+   FROM(
+         SELECT E.REFUND_SEQ, E.REFUND_DATE, E.PAY_SEQ, E.USER_SEQ,
+               @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM REFUND_PAYMENT E, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+
+</select>
+
+<!-- 크레딧 생성 -->
+<insert id="createCredit" parameterType="CreditDto">
+INSERT INTO CREDIT
+( MILG_CREDIT, REMAIN_CREDIT, CREDIT_DATE, USER_SEQ)
+VALUES( #{milg_credit}, #{remain_credit}, NOW(), #{user_seq})
+</insert>
+<!-- 처음 결제인지 판단 여부-->
+<update id="payChk" parameterType="java.lang.Integer">
+   UPDATE "USER" SET USER_PCHK = 'Y' WHERE USER_SEQ = #{user_seq}
+</update>
+
+<!-- 처음 충전할 때 크레딧 
+   ex) 처음 마넌 충전 10개 생김   그다음 50개 충전 60개 생김 -->
+<select id="updateCredit" parameterType="java.lang.Integer" resultType="java.lang.String">
+<![CDATA[
+SELECT A.REMAIN_CREDIT 
+               FROM(
+                   SELECT C.REMAIN_CREDIT , C.USER_SEQ, @ROWNUM := @ROWNUM + 1 as RNUM 
+                   FROM CREDIT C, (select @ROWNUM := 0) R
+                   ORDER BY CREDIT_DATE DESC) A
+               WHERE RNUM <= 1 AND USER_SEQ = #{user_seq}
+]]>
+</select>
+<!-- 결제 환불시 크레딧 환불 -->
+<select id="refundCredit" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+            SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT, USER_SEQ
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) - MILG_CREDIT
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+</select>
+
+<!-- user_seq 가 user_grade 가 T 일 때 공고글 올릴 때 크레딧 소모가 10개 -->
+<update id="updateTpost" parameterType="java.lang.Integer">
+<![CDATA[
+   SELECT REMAIN_CREDIT 
+      FROM(
+          SELECT REMAIN_CREDIT
+          FROM CREDIT
+          ORDER BY ROWNUM DESC)
+      WHERE ROWNUM = 1) - 10
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+      AND REMAIN_CREIDT > 9
+      ]]>
+</update>
+<!-- user_seq 가 user_grade 가 M 일 때 공고글 올릴 때 크레딧 소모가 6개 -->
+<update id="updateMpost" parameterType="java.lang.Integer">
+<![CDATA[
+   UPDATE CREDIT 
+   SET REMAIN_CREDIT = (
+               SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) - 6
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+      AND REMAIN_CREIDT > 5
+      ]]>
+</update>
+<!-- user_seq가 user_grade 가 M 일 때 공고글을 올렸는데 공고의 bidding 이 N 일 때 크레딧 3개 환불 -->
+<update id="updateMregi_BN" parameterType="java.lang.Integer">
+   UPDATE CREDIT 
+   SET REMAIN_CREDIT = (
+               SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) + 3
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+</update>
+<!--  user_seq가 user_grade 가 M 일 때 강사를 콕찝어서 매칭 됐을때 크레딧 소모가 15개 -->
+<update id="updateMregi_selT" parameterType="java.lang.Integer">
+   UPDATE CREDIT 
+   SET REMAIN_CREDIT = (
+               SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) - 15
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+      AND REMAIN_CREIDT > 14
+</update>
+<!--  user_seq 가 user_grade 가 T 일 때 멘티에게 매칭 신청시 크레딧 소모가 10개 -->
+<update id="updateTregi_selM" parameterType="java.lang.Integer">
+   UPDATE CREDIT 
+   SET REMAIN_CREDIT = (
+               SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) - 10
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+      AND REMAIN_CREIDT > 9
+</update>
+<!--  user_seq가 user_grade 가 T 일 때  멘티안테 매칭 신청했는데 안됏을 때 크레딧 5개 환불 -->
+<update id="updateTregi_selT" parameterType="java.lang.Integer">
+   UPDATE CREDIT 
+   SET REMAIN_CREDIT = (
+               SELECT REMAIN_CREDIT 
+               FROM(
+                   SELECT REMAIN_CREDIT
+                   FROM CREDIT
+                   ORDER BY ROWNUM DESC)
+               WHERE ROWNUM = 1) + 5
+      WHERE USER_SEQ = #{user_seq}
+      AND ROWNUM = 1
+</update>
+
+<!-- 크레딧 내역 조회 -->
+<select id="selectCredit" parameterType="java.util.Map" resultType="CreditDto">
+SELECT A.CREDIT_SEQ, A.REMAIN_CREDIT, A.MILG_CREDIT, date_format(A.CREDIT_DATE,'%Y-%m-%d') AS CREDIT_DATE, A.USER_SEQ
+   FROM(
+         SELECT C.CREDIT_SEQ, C.REMAIN_CREDIT, C.MILG_CREDIT, C.CREDIT_DATE, C.USER_SEQ,
+               @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM CREDIT C, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+      AND USER_SEQ = #{user_seq}
+      order by `CREDIT_SEQ` desc
+</select>
+<!-- 관리자 크레딧 내역 조회 -->
+<select id="selectAdCredit" parameterType="java.util.Map" resultType="CreditDto">
+SELECT A.CREDIT_SEQ, A.REMAIN_CREDIT, A.MILG_CREDIT, date_format(A.CREDIT_DATE,'%Y-%m-%d') AS CREDIT_DATE, A.USER_SEQ
+   FROM(
+         SELECT C.CREDIT_SEQ, C.REMAIN_CREDIT, C.MILG_CREDIT, C.CREDIT_DATE, C.USER_SEQ,
+               @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM CREDIT C, (select @ROWNUM := 0) R
+      ) A
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+      order by `CREDIT_SEQ` desc
+</select>
+
+<!-- 크레딧 환불 내역 조회 -->
+<select id="selectCreRef" parameterType="java.lang.String" resultType="RefundCreDto">
+SELECT REFUNDCREDIT_SEQ, TO_CHAR(REFUNDCREDIT_DATE,'YYYY-MM-DD') AS REFUNDCREDIT_DATE
+   FROM REFUND_CREDIT
+      WHERE REFUNDCREDIT_SEQ = #{refundcredit_seq}
+</select>
+
+<!-- 크레딧 마지막꺼 구하 -->
+
+</mapper>

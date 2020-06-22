@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+	
+	<context:component-scan base-package="com.start.pro"/>
+	
+	<mvc:annotation-driven/>
+	
+	<security:http auto-config="true" use-expressions="true">
+	
+		<security:access-denied-handler error-page="/access_denied_page.do"/>
+		
+
+		<security:intercept-url  pattern="/*.js"
+			access="none" />
+		<security:intercept-url pattern="/*.css"
+			access="none" />
+		<security:intercept-url pattern="/*.jpg"
+			access="none" />
+
+		<security:intercept-url pattern="/U**"
+			access="hasAnyAuthority('ROLE_M','ROLE_T','ROLE_A')" />
+
+		<security:intercept-url pattern="/M**"
+			access="hasRole('ROLE_M')" />
+		<security:intercept-url pattern="/T**"
+			access="hasRole('ROLE_T')" />
+		<security:intercept-url pattern="/A**"
+			access="hasRole('ROLE_A')" />
+		
+		<security:intercept-url pattern="/**"
+			access="permitAll" />
+
+		<security:form-login
+			login-processing-url="/logingo.do"
+			 login-page="/loginForm.do"
+			authentication-failure-handler-ref="loginFailureHandler"
+			authentication-success-handler-ref="loginSuccessHandler"	
+			 username-parameter="username"
+			password-parameter="password"
+			always-use-default-target='true'/>
+
+		<!-- 로그아웃되면 세션 초기화 해준다 -->
+		<security:logout invalidate-session="true"
+			logout-url="/logout.do" logout-success-url="/logoutSuccess.do"
+			delete-cookies="JSESSIONID,SPRING_SECURITY_REMEMBER_ME_COOKIE"/>
+		<!-- 4주 -->
+		<security:remember-me key="new_start" token-validity-seconds="2419200"
+		remember-me-parameter="remember_me" authentication-success-handler-ref="loginSuccessHandler"
+		data-source-ref="dataSource" user-service-ref="memberService"/>
+
+		<security:csrf disabled="true"/>
+	
+	<security:session-management invalid-session-url="/loginForm.do"  session-fixation-protection="changeSessionId">
+		<security:concurrency-control max-sessions="1" expired-url="/loginForm.do"/>
+	</security:session-management>
+	
+	</security:http>
+
+
+	<!-- UserDetailsService 핸들러 -->
+	<bean id="memberService" class="com.start.pro.security.Sc_UserDetailsService" />
+
+	<!-- User 핸들러 -->
+	<bean id="details" class="com.start.pro.security.Sc_User"/>
+	
+	<!-- AuthenticationProvider 핸들러-->
+	<bean id="customProvider" class="com.start.pro.security.Sc_AuthenticationProvider"/>
+	
+	
+
+	<!-- 비밀번호 암호화 -->
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	
+	<!-- 로그인 성공 핸들러 -->
+	<bean id="loginSuccessHandler" class="com.start.pro.security.Sc_LoginSuccessHandler">
+		<property name="loginidname" value="username"/>
+		<property name="defaultUrl" value="/loginResult.do"/>
+	</bean> 
+	
+	<!-- 로그인 실패 핸들러 -->
+	<bean id="loginFailureHandler" class="com.start.pro.security.Sc_LoginFailureHandler">
+		<property name="loginidname" value="username"/>
+    	<property name="loginpwdname" value="password"/>
+		<property name="errormsgname" value="ERRORMSG"/>
+    	<property name="defaultFailureUrl" value="/loginForm.do?error"/>
+	</bean>
+
+	<!-- 오류 메세지 핸들링 -->
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>/WEB-INF/message/security_message</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8"/>
+		<property name="cacheSeconds" value="10"/>
+	</bean>	
+	
+	<bean class="org.springframework.context.support.MessageSourceAccessor">
+		<constructor-arg ref="messageSource"/>
+	</bean>
+	
+	<bean class="com.start.pro.util.Util_Message" id="messageUtils"/>
+
+	<!-- 메일 보내기 설정 -->
+	   <bean 
+      class="org.springframework.mail.javamail.JavaMailSenderImpl">
+      <property name="host" value="smtp.gmail.com" />
+      <property name="port" value="587" />
+      <property name="username" value="ckadl0118@gmail.com" />
+      <property name="password" value="snfl29336313!" />
+      <property name="javaMailProperties">
+         <props>
+            <prop key="main.debug">true</prop>
+            <prop key="mail.smtp.auth">true</prop>
+            <prop key="mail.transport.protocol">smtp</prop>
+            <prop key="mail.smtp.starttls.enable">true</prop>
+         </props>
+      </property>
+   </bean>
+	
+	
+	<security:authentication-manager>
+		 <security:authentication-provider ref="customProvider"/>
+		 <security:authentication-provider user-service-ref="memberService">
+		 	<security:password-encoder ref="passwordEncoder"/>
+		 </security:authentication-provider>
+	</security:authentication-manager>
+	
+	
+	
+		<!-- 캡챠 설정 -->
+	<!-- 전송위한 String apiURL 빈 생성 -->
+	<bean class="java.lang.String" id="apiURL">
+		<constructor-arg value="https://openapi.naver.com/v1/captcha/nkey?code="/>
+	</bean>
+	
+	<!-- 클라이언트 아이디와 시크릿 번호 담은 Map bean 생성 -->
+	<util:map id="captchaMap" map-class="java.util.HashMap">
+		<entry key="X-Naver-Client-Id">
+			<value>_IL4ccU76VeEECDveKaq</value>
+		</entry>
+		<entry key="X-Naver-Client-Secret">
+			<value>_vKeWYMEmb</value>
+		</entry>
+	</util:map>	
+	
+	
+	
+</beans>

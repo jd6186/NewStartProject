@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+<!-- websocket:transport 항상 제일 위에 있어야하며  한번에 전송되는 메시지의 크기를 결정한다. -->
+	<websocket:message-broker application-destination-prefix="/app">
+		<websocket:transport message-size="131072"  send-timeout="15000" send-buffer-size="524288" />
+        <websocket:stomp-endpoint path="/push" >
+            <websocket:sockjs/>
+        </websocket:stomp-endpoint>
+        <websocket:simple-broker prefix="/topic"/>
+    </websocket:message-broker>
+
+
+	<!-- @Component객체를 빈으로 찾아서 등록해주는 namespace -->
+	<context:component-scan
+		base-package="com.start.pro" />
+
+	<!-- @Cotroller를 통해 MVC 만들기 -->
+	<mvc:annotation-driven />
+
+	<task:executor id="myex" pool-size="10" />
+	<task:annotation-driven executor="myex" />
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		        <property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+	<!-- Resolver설정 -->
+	<!-- DispatcherServlet에의해 반환된 String을 조합하여 화면으로 이동 -->
+	<!-- TilesResolver로 검색을해가지고 그 레이아웃자체를 긁어다 붙혀 쓰는게 국룰 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+
+
+		<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- <mvc:mapping path="/boardList.do"/> -->
+			<mvc:mapping path="/UinsertBoard.do" />
+			<bean class="com.start.pro.intercepter.intercepter" />
+		</mvc:interceptor>
+		</mvc:interceptors>
+	
+	
+</beans>

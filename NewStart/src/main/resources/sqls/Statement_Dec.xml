@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.Dec">
+<!-- 	<resultMap type="" id=""> -->
+<!-- 		<result column="" property=""/> -->
+<!-- 	</resultMap> -->
+
+	<!-- 신고 전체 조회 / 상세 조회 -->
+	<select id="searchDecAll"  resultType="DecDto">
+		SELECT DEC_SEQ, DEC_VICTIM, DEC_SUSPECT, BOARD_CODE, BOARD_SEQ,
+		TO_CHAR(DEC_DATE,'YYYY-MM-DD') AS DEC_DATE, DEC_PRODATE, CONTENT
+		FROM
+		DECBOARD
+		WHERE DEC_PRODATE IS NULL
+		ORDER BY DEC_SEQ
+	</select>
+	
+	<select id="searchDecDetail" parameterType="java.lang.Integer" resultType="DecDto">
+		SELECT DEC_SEQ, DEC_VICTIM, DEC_SUSPECT, BOARD_CODE, BOARD_SEQ,
+		TO_CHAR(DEC_DATE,'YYYY-MM-DD') AS DEC_DATE, DEC_PRODATE, CONTENT
+		FROM
+		DECBOARD
+		WHERE DEC_SEQ = #{dec_seq}
+	</select>
+
+	<!-- 신고하기 -->
+	<insert id="insertDec" parameterType="DecDto">
+	INSERT INTO DECBOARD
+      (DEC_SEQ, DEC_VICTIM, DEC_SUSPECT, BOARD_CODE, BOARD_SEQ)
+	VALUES(DEC_SEQS.NEXTVAL, #{dec_victim}, #{dec_suspect}, '4000', #{board_seq})
+	</insert>
+
+	<!-- 경고를 받아 경고횟수 1회 증가 -->
+	<update id="updateDeccnt" parameterType="java.lang.String">
+		UPDATE "USER" 
+		SET DEC_CNT=DEC_CNT+1
+		WHERE USER_SEQ =
+		(SELECT DEC_SUSPECT
+			FROM DECBOARD d
+			WHERE DEC_SEQ =#{dec_seq})
+	</update>
+	<update id="updateProDate" parameterType="java.lang.String">
+		UPDATE DECBOARD 
+		SET DEC_PRODATE = SYSDATE
+		WHERE DEC_SEQ =#{dec_seq}
+	</update>
+
+	<!-- 경고 횟수 증가 후 경고횟수 3회를 넘으면 회원 탈퇴 -->
+	<update id="delCntChk" parameterType="java.lang.String">
+		UPDATE "USER"
+		SET USER_TYPE ='D' 
+		WHERE USER_SEQ = 
+		(SELECT DEC_SUSPECT
+			FROM DECBOARD d
+				WHERE DEC_SEQ =#{dec_seq})  
+		AND DEC_CNT >=3
+	</update>
+	
+	<delete id="delCookie" parameterType="java.lang.String">
+		DELETE FROM PERSISTENT_LOGINS
+		WHERE USERNAME = (SELECT USER_NAME 
+						FROM "USER"
+							WHERE USER_SEQ=(SELECT DEC_SUSPECT
+											FROM DECBOARD d
+												WHERE DEC_SEQ =#{dec_seq}))
+	</delete>
+	
+	
+	
+</mapper>

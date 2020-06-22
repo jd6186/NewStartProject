@@ -1,0 +1,361 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.start.pro</groupId>
+	<artifactId>NewStart</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>NewStart Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<!-- repository -->
+	<repositories>
+		<repository>
+			<id>oracle</id>
+			<name>ORACLE JDBC Repository</name>
+			<url>http://maven.jahia.org/maven2</url>
+		</repository>
+	</repositories>
+	<!-- properties -->
+	<properties>
+		<java-version>1.8</java-version>
+		<springframework>5.2.1.RELEASE</springframework>
+		<aspect>1.9.2</aspect>
+		<slf4j>1.7.25</slf4j>
+		<spring.security.version>4.2.7.RELEASE</spring.security.version>
+	</properties>
+
+
+	<dependencies>
+		<!-- spring-core -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<!-- 위에 보면 properties에 <org.springframework-version>가 써있는게 보이지? 그걸 EL방식으로 
+				가져와서 넣은 것 뿐이야 여러번 쓰일거기 때문에 properties로 지정한 것이지~ -->
+			<version>${springframework}</version>
+
+			<!-- Exclude Commons Logging in favor of SLF4j -->
+			<!-- exclusions는 dependence hierarchy에서 다른 라이브러리와 충돌이 발생되기 때문에 dependency를 
+				무시하고 가져오지 않는다. 즉, SLF4j와 충돌이 발생하는commons-logging은 제외하고 가져오기 위해 exclusions을 
+				설정해준것이다. -->
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+		<!-- spring-orm -->
+
+
+
+
+		<!-- spring-context -->
+
+
+
+
+
+		<!-- spring-mvc -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+
+
+
+
+		<!-- Aspect관련 AOP의 CCC기능을 작성한다. (Transaction, log, ) -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>${aspect}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>${aspect}</version>
+		</dependency>
+
+
+
+
+
+		<!-- spring은 log를 처리할 때 log4j를 사용하여 구현한 sl4j를 사용 -->
+		<!-- Log4j를 상속하여 향상된 기능을 구현해준다. -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+
+
+		<!-- 사용자 로그 처리를 위한 log4j를 가져온다. -->
+
+		<!-- Log4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<!-- 위 slf4j와 충돌이 발생하기 때문에 버전을 맞춰 충돌을 제거해줘야된다. 충돌 여부는 밑에 Dependency Hierarchy를 
+				통해 보면서 맞춰준다.compile이 다 되야된다. -->
+			<version>1.2.17</version>
+			<!-- 밑에 것들은 이미 tomcat이 가지고 있기 때문에 배제하고 가져온것이다. -->
+			<exclusions>
+				<exclusion>
+					<groupId>javax.mail</groupId>
+					<artifactId>mail</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.jms</groupId>
+					<artifactId>jms</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jdmk</groupId>
+					<artifactId>jmxtools</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jmx</groupId>
+					<artifactId>jmxri</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>runtime</scope>
+		</dependency>
+
+
+
+		<!-- 의존적 주입 DI를 만들기 위해, 생성된 bean을 주입할 대 사용하는 객체 -->
+		<!-- @Inject 즉, IoC의 DI가 가능하게 만들기(@Autowired같은 것들은 context에 있고 이건 다른 것) -->
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+
+
+		<!-- Servlet관련 API들 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- jsp-api -->
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSTL -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+
+
+		<!-- java.lang.String의 객체를 편하게 사용하기 위해 사용하는 commonslang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+
+
+		<!-- ojdbc6 -->
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>12.1.0.1</version>
+		</dependency>
+
+		<!-- mybatis -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.5.3</version>
+		</dependency>
+
+		<!-- Spring - orm -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+
+
+		<!-- mybatis - spring -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+
+		<!-- Commons-dbcp -->
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+
+
+		<!-- 아작스를 작성하여 반환타입을 Map으로 했을 경우 자동으로 json으로 변경해주는 라이브러리 jackson.core / 
+			jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+
+
+
+		<!-- java mail API를 통해서 Spring에서 메일을 보낼 수 있도록 하는 라이브러리, java mail API와 
+			이걸 spring으로 받아줄 수 있는 spring-context-support가 둘다 필요 -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+
+
+
+		<!-- spring Security : web에서 사용할 것이기 때문에 config와 web을 가져와야한다. -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+
+		<!-- ajax를 json으로 반환해주는 객체 -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+
+		<!-- websocket과 메시지 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-messaging</artifactId>
+			<version>${springframework}</version>
+		</dependency>
+
+
+		<!-- 시큐리티 -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-config -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+			<version>${spring.security.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<!-- Coolsms JAVA SDK : 문자 전송, 전송내역 관리, 알림톡 전송 등 여러 서비스를 이용하기 위한 라이브러리 -->
+		<!-- https://developer.coolsms.co.kr/JAVA_SDK_Start_here -->
+		<!-- https://developer.coolsms.co.kr/opage/manual/java/index.html 에서 정확한 
+			분석 가능 -->
+		<dependency>
+			<groupId>net.nurigo</groupId>
+			<artifactId>javaSDK</artifactId>
+			<version>2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+
+	<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+	<dependency>
+		<groupId>org.springframework.security</groupId>
+		<artifactId>spring-security-taglibs</artifactId>
+		<version>4.2.7.RELEASE</version>
+	</dependency>
+	
+
+
+
+
+
+	
+	</dependencies>
+
+	<build>
+		<finalName>NewStart</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

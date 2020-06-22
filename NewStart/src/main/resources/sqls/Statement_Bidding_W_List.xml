@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.bidding_w_list">
+
+
+<!-- 필요기능 1. 성공된 매칭의 매칭 입찰자 전체 조회하기(성공한 사람만 따로 조회하는 기능) -->
+<select id="bwl_show" resultType="BWL_Dto">
+SELECT SUCCESS_PERSON, GONGGO_SEQ, BOARD_CODE
+	FROM BIDDING_W_LIST
+</select>
+
+<!-- 필요기능 2. 해당 공고글 상세조회 -->
+<select id="bwl_detail" parameterType="java.lang.String" resultType="BWL_Dto">
+SELECT SUCCESS_PERSON, GONGGO_SEQ, BOARD_CODE
+	FROM BIDDING_W_LIST
+	WHERE GONGGO_SEQ = #{gonggo_seq}
+</select>
+
+
+<!-- 필요기능 3. 성공된 매칭의 매칭 입찰자 등록하기 -->
+<insert id="bwl_winner" parameterType="BWL_Dto">
+INSERT INTO BIDDING_W_LIST(SUCCESS_PERSON, GONGGO_SEQ, BOARD_CODE)
+	VALUES(#{success_person}, #{gonggo_seq}, 2000)
+</insert>
+
+
+
+
+</mapper>

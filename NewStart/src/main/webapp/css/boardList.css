@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+#select{
+	width: 100%;
+	text-align: right;
+	margin-bottom: 10px;
+}
+
+div.center{
+	text-align: center;
+	
+}
+/* 
+ul.pagination{
+	display:inline;
+}
+ul.pagination li a{
+	color: black;
+	float: left;
+	padding: 10px 20;
+	text-decoration: none;
+	transtition: background-color .3s;
+	border: 1px solid #ddd;
+}
+
+ul.pagination li a:active{
+	background-color: #4a4a4a;
+	color: white;
+	border: 1px solid #4a4a4a;
+} 
+*/

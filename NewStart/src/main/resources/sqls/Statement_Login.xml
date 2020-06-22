@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.login">
+
+<!-- 로그인 -->
+
+<!-- 아이디를 통해 비밀번호와 권한 가져온다  -->
+<select id="getPW" parameterType="java.lang.String" resultType="UserDetailsDto">
+SELECT  USER_EMAIL, USER_PW, USER_GRADE, USER_TYPE FROM USER u
+ WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D'
+</select>
+<!--OK  -->
+ 
+ <!-- 회원번호 통해 유저 정보 가져온다 (세션에 담기 위해) -->
+<select id="getUser" parameterType="java.lang.String" resultType="UserDto">
+SELECT USER_SEQ, USER_EMAIL, USER_NICKNAME, USER_NAME, 
+  USER_GRADE, USER_TYPE, USER_PHONE, USER_ADCHK, USER_REGDATE, USER_TCHK, USER_PCHK
+   FROM USER u
+    WHERE USER_EMAIL  = #{user_email} AND USER_TYPE != 'D'
+</select>
+<!-- OK -->
+
+
+<!-- 회원이메일을 통해 로그인 날짜 업데이트-->
+ <update id="loginUpdate" parameterType="java.lang.String">
+ UPDATE USER_LOG SET LAST_LOGIN = NOW() 
+ WHERE USER_SEQ  = (SELECT USER_SEQ FROM USER WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D')
+ </update>
+  <!-- OK -->
+ <!-- 휴면회원을 일반회원으로 등급 변경  -->
+ <update id="changeSleep" parameterType="java.lang.String">
+ UPDATE USER SET USER_TYPE = 'N'
+  WHERE USER_EMAIL  = #{user_email}
+ </update>
+ <!-- OK -->
+ <!-- 비밀번호 틀린 횟수 +1해주기 -->
+<!--  <update id="plusPWFail" parameterType="java.lang.String">
+ UPDATE USER_LOG SET PW_FAIL_CHK  = PW_FAIL_CHK+1
+  WHERE USER_SEQ  = (SELECT USER_SEQ FROM "USER" WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D')
+ </update> -->
+ 
+ 
+ <!--비밀번호 틀린 횟수 가져오기 -->
+<!-- <select id="getPWFail" parameterType="java.lang.String" resultType="java.lang.String">
+SELECT PW_FAIL_CHK 
+ FROM USER_LOG ul
+  WHERE USER_SEQ = (SELECT USER_SEQ FROM "USER" WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D')
+</select> -->
+  
+  
+  
+  
+  <!-- 회원정보 -->
+  
+ <!--아이디/ 닉네임 중복검사-->
+ <select id="MultipleChk" parameterType="java.util.Map" resultType="java.lang.Integer">
+ SELECT COUNT(*) FROM USER u 
+   <choose>
+      <when test="user_email != null">
+          WHERE USER_EMAIL = #{user_email}
+      </when>
+      <when test="user_nickname != null">
+           WHERE USER_NICKNAME = #{user_nickname}
+      </when>
+   </choose>
+   AND USER_TYPE != 'D'
+ </select>
+  <!-- OK -->
+  
+  
+  
+  
+ <!-- 유저정보 넣기 / 권한은 잠금 -->
+ <insert id="signUp" parameterType="UserDto">
+INSERT INTO USER
+(USER_EMAIL, USER_NICKNAME, USER_NAME, USER_PW, USER_PHONE, USER_ADCHK, USER_REGDATE)
+VALUES(#{user_email}, #{user_nickname}, #{user_name} ,#{user_pw}, #{user_phone}, #{user_adchk}, NOW())
+<selectKey resultType="java.lang.String" order="AFTER" keyProperty="user_seq">
+ SELECT USER_SEQ FROM USER WHERE USER_EMAIL = #{user_email}
+</selectKey>
+ </insert>
+ <!-- OK -->
+ 
+ 
+<!-- 유저로그에 정보 넣기-->
+ <insert id="signUpLog" parameterType="java.lang.String">
+   INSERT INTO USER_LOG
+      (USER_SEQ, PW_UPDATE_DATE)
+         VALUES(#{user_seq}, NOW())
+ </insert>
+ <!-- OK -->
+ 
+ 
+ 
+<!-- 유저 권한 일반 유저로 변환(이메일 인증 성공시)-->
+ <update id="changeNomal" parameterType="java.lang.String">
+ UPDATE USER SET USER_TYPE = 'N'
+     WHERE USER_EMAIL = #{user_email}
+ </update>
+ <!--OK  -->
+ 
+ 
+ <!-- 아이디 찾기 -->
+ 
+ 
+ <!-- 휴대폰 번호로 아이디 가져오기-->
+<select id="findId" parameterType="java.lang.String" resultType="java.lang.String">
+   SELECT USER_EMAIL FROM USER u
+       WHERE USER_PHONE = #{user_phone} AND USER_TYPE != 'D'
+</select>
+<!-- OK -->
+
+<!-- 비밀번호 찾기 -->
+
+<!-- 이메일로  비밀번호 업데이트하기-->
+ <update id="changePW" parameterType="java.util.Map">
+    UPDATE USER SET USER_PW = #{user_pw} 
+       WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D'
+ </update>
+ <!-- OK -->
+ 
+ <!-- 마지막 비밀번호 변경일 수정 -->
+<update id="updatePWLog" parameterType="java.lang.String">
+   UPDATE USER_LOG SET PW_UPDATE_DATE = NOW()
+      WHERE USER_SEQ = 
+         (SELECT USER_SEQ 
+            FROM USER 
+               WHERE USER_EMAIL = #{user_email} AND USER_TYPE != 'D')   
+</update>
+<!-- OK -->
+</mapper>

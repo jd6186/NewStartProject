@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.Review">
+
+
+	<!-- 게시물 조회 -->
+	<select id="searchAll" parameterType="com.start.pro.dto.DTO_Criteria" resultType="ReDto">
+		SELECT RE_SEQ, USER_SEQ, TO_CHAR(RE_REGDATE,'YY-MM-DD HH24:MI:SS') RE_REGDATE ,
+		 CASE RE_TEACHER WHEN 0 THEN '답글:   '||RE_CONTENT ELSE RE_CONTENT END RE_CONTENT, 
+		  RE_TEACHER, RE_STAR,FILEOX 
+      FROM
+         (
+         SELECT RE_SEQ, USER_SEQ, RE_REGDATE , 
+         RE_CONTENT, RE_TEACHER, RE_STAR,FILEOX , 
+         ROW_NUMBER() OVER(ORDER BY  RE_GROUP DESC,RE_SEQ) AS RNUM
+         FROM REVIEWBOARD
+      )
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+	</select>
+	<!-- 게시글 총 갯수 구하기 -->
+	<select id="listCount" resultType="java.lang.Integer">
+  		<![CDATA[
+      		SELECT COUNT(RE_SEQ)
+        		FROM REVIEWBOARD
+      	 		WHERE RE_SEQ > 0
+   		]]>
+	</select>
+	
+	<!-- 게시물 상세 조회 -->
+	<select id="searchDetail" parameterType="java.lang.Integer" resultType="ReDto">
+		SELECT RE_SEQ, USER_SEQ, TO_CHAR(RE_REGDATE,'YY-MM-DD HH24:MI:SS') RE_REGDATE , RE_CONTENT, RE_TEACHER, RE_STAR,FILEOX
+			FROM REVIEWBOARD
+				WHERE RE_SEQ =#{re_seq}
+	</select>
+	
+	<!-- 게시물 등록 -->
+	<insert id="insertReview" parameterType="ReDto">
+	INSERT INTO REVIEWBOARD
+		(BOARD_CODE, RE_SEQ, USER_SEQ,
+		   RE_CONTENT,RE_TEACHER,
+		 RE_GROUP,   RE_STAR, FILEOX)
+	VALUES('4000', RE_SEQ.NEXTVAL, #{user_seq}, 
+		    #{re_content}, #{re_teacher}, 
+	   RE_GROUP_SEQ.NEXTVAL, #{re_star},#{fileox}
+	   )
+	</insert>
+	
+	<!-- 게시물 수정 -->
+	<update id="updateReview" parameterType="ReDto">
+		UPDATE REVIEWBOARD 
+		SET  RE_CONTENT=#{re_content},RE_STAR=#{re_star}
+		WHERE RE_SEQ =#{re_seq} AND RE_REPLY ='N'
+	</update>
+	
+	<!-- 게시물 삭제 -->
+	<update id="delReview" parameterType="java.lang.Integer">
+		UPDATE REVIEWBOARD 
+		SET RE_DELETE ='Y'
+		WHERE RE_SEQ =#{re_seq} AND RE_REPLY ='N'
+	</update>
+	
+	<!-- 게시물 신고 -->
+	<insert id="decReview" parameterType="DecDto">
+	INSERT INTO DECBOARD
+      (DEC_SEQ, DEC_VICTIM, DEC_SUSPECT, 
+       BOARD_CODE, BOARD_SEQ, CONTENT)
+	VALUES(DEC_SEQS.NEXTVAL, #{dec_victim}, #{dec_suspect}, 
+		   4000, #{board_seq}, #{content})
+	</insert>
+	
+	<!-- 답글 등록 -->
+	<!-- 부모글 업데이트 -->
+	<update id="updateParent" parameterType="java.lang.Integer">
+		UPDATE REVIEWBOARD 
+			SET RE_REPLY ='Y' 
+			WHERE RE_SEQ =#{re_seq}
+	</update>
+	<!-- 답글 등록 -->
+	<insert id="insertReply" parameterType="ReDto">
+		INSERT INTO REVIEWBOARD
+			(BOARD_CODE, RE_SEQ, USER_SEQ, 
+			 RE_REGDATE, RE_CONTENT, 
+			RE_GROUP, RE_REPLY, RE_STAR)
+		VALUES
+			(4000, RE_SEQ.NEXTVAL, (SELECT RE_TEACHER FROM REVIEWBOARD WHERE RE_SEQ =#{re_seq}),
+			 SYSDATE, #{re_content},
+			 (SELECT RE_GROUP FROM REVIEWBOARD WHERE RE_SEQ=#{re_seq}), 'Y', #{re_star})
+	</insert>
+	
+	<!-- 내가 올린 공고 중 매칭 성공한 공고들  -->
+	<select id="searchMaching" parameterType="java.lang.Integer" 
+			resultType="java.lang.Integer">
+		SELECT GONGGO_SEQ 
+		FROM GONGO g 
+		WHERE USER_SEQ =#{user_seq} AND BIDDING ='Y'
+	</select>
+	
+	<!-- 성공한 공고의 강사 찾기 -->
+	<select id="searchTeacher" parameterType="java.lang.Integer" 
+			resultType="java.lang.String">
+		SELECT USER_NAME
+		FROM USER
+		WHERE USER_SEQ =(SELECT SUCCESS_PERSON 
+						FROM BIDDING_W_LIST 
+						WHERE GONGGO_SEQ = (SELECT GONGGO_SEQ 
+											FROM GONGO g 
+											WHERE USER_SEQ =#{user_seq} AND BIDDING ='Y'))
+	</select>
+	
+	<!-- 		 필요기능 7. 파일 유무 조회 (있으면 해당 파일을 가져오게 할거임) -->
+<select id="review_fileox"  parameterType="java.lang.String" resultType="java.lang.String">
+SELECT FILEOX
+	FROM GONGO g 
+	WHERE GONGGO_SEQ=#{grade_seq}
+</select>
+  
+  
+<!--	 필요기능 8. 업로드된 파일  조회(있으면 파일 첨부되어있다고 표시하고 파일 테이블로부터 데이터 받아오게 만들기)  -->
+<select id="review_upload_file_view"  parameterType="java.lang.String" resultType="FileDto">
+SELECT FILE_SEQ, FILEBOARD, BOARD_SEQ, FILENAME, FILEREALNAME, FILEURL, FILEDATE, FILETYPE
+	FROM FILEBOARD 
+	WHERE FILEBOARD = 4000 AND BOARD_SEQ = #{grade_seq}
+</select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

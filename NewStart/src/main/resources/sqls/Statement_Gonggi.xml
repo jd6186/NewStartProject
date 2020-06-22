@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.gonggi">
+
+<!-- 전체글 조회 -->
+<select id="GI_AllSelect" parameterType="com.start.pro.dto.DTO_Criteria" resultType="GongGiDto">
+SELECT F.GI_SEQ, F.GI_TITLE, F.GI_CONTENT, date_format(F.GI_REGDATE,'%Y-%m-%d') AS GI_REGDATE, F.GI_CATEGORY, F.GI_CATEGORY
+      FROM
+         (
+         SELECT GI_SEQ, GI_TITLE, GI_CONTENT, GI_REGDATE, GI_CATEGORY
+         FROM GONGGI
+         WHERE GI_CATEGORY = 'Y'
+         ORDER BY GI_SEQ DESC
+      ) F
+   UNION ALL
+   SELECT D.GI_SEQ, D.GI_TITLE, D.GI_CONTENT, date_format(D.GI_REGDATE,'%Y-%m-%d') AS GI_REGDATE, D.GI_CATEGORY, D.GI_CATEGORY
+      FROM
+         (
+         SELECT G.GI_SEQ, G.GI_TITLE, G.GI_CONTENT, G.GI_REGDATE, G.GI_CATEGORY, @ROWNUM := @ROWNUM + 1 as RNUM
+         FROM GONGGI G, (select @ROWNUM := 0) R
+         WHERE GI_CATEGORY = 'N'
+         order by G.GI_SEQ DESC
+      ) D
+      WHERE RNUM BETWEEN #{rowStart} AND #{rowEnd}
+</select>
+
+<!-- 게시물 총 갯수 -->
+<select id="listCount" resultType="java.lang.Integer">
+   <![CDATA[
+      SELECT COUNT(GI_SEQ)
+        FROM GONGGI
+       WHERE GI_SEQ > 0
+   ]]>
+</select>
+
+<!-- 상세글 조회 -->
+<select id="GI_OneSelect" parameterType="java.util.Map" resultType="GongGiDto">
+SELECT GI_SEQ, GI_TITLE, GI_CONTENT, date_format(GI_REGDATE,'%Y-%m-%d') AS GI_REGDATE, GI_CATEGORY
+   FROM GONGGI
+      WHERE GI_SEQ = #{gi_seq} AND
+   <choose>
+      <when test='gi_category == "Y"'>
+          GI_CATEGORY = #{gi_category}
+      </when>
+      <otherwise>
+         GI_CATEGORY = #{gi_category}
+      </otherwise>
+   </choose>
+</select>
+
+<!-- 중요 공지글 등록 -->
+<insert id="GI_Imp_Insert" parameterType="GongGiDto">
+INSERT INTO GONGGI(BOARD_CODE, GI_CATEGORY, GI_TITLE, GI_CONTENT, GI_REGDATE, ADMIN_SEQ)
+   VALUES(1000, 'Y', #{gi_title}, #{gi_content}, NOW(), 1)
+</insert>
+
+<!-- 일반 공지글 등록 -->
+<insert id="GI_UImp_Insert" parameterType="GongGiDto">
+INSERT INTO GONGGI(BOARD_CODE, GI_CATEGORY, GI_TITLE, GI_CONTENT, GI_REGDATE, ADMIN_SEQ)
+   VALUES(1000, 'N', #{gi_title}, #{gi_content}, NOW(), 1)
+</insert>
+
+<!-- 카테고리 수정 Y -> N, N -> Y -->
+<update id="GI_Update" parameterType="GongGiDto">
+UPDATE GONGGI
+   <set>
+      <choose>
+         <when test='gi_category == "Y"'>
+            GI_CATEGORY='N', GI_TITLE=#{gi_title}, GI_CONTENT=#{gi_content}, GI_REGDATE=NOW()
+         </when>
+         <otherwise>
+            GI_CATEGORY='Y', GI_TITLE=#{gi_title}, GI_CONTENT=#{gi_content}, GI_REGDATE=NOW()
+         </otherwise>
+      </choose>
+   </set>
+      WHERE GI_SEQ = #{gi_seq}
+</update>
+
+<!-- 그냥 수정 -->
+<update id="N_update" parameterType="GongGiDto">
+UPDATE GONGGI
+   <set>
+      <choose>
+         <when test='gi_category == "Y"'>
+            GI_CATEGORY='Y', GI_TITLE=#{gi_title}, GI_CONTENT=#{gi_content}, GI_REGDATE=NOW()
+         </when>
+         <otherwise>
+            GI_CATEGORY='N', GI_TITLE=#{gi_title}, GI_CONTENT=#{gi_content}, GI_REGDATE=NOW()
+         </otherwise>
+      </choose>
+   </set>
+      WHERE GI_SEQ = #{gi_seq}
+</update>
+
+<!-- 공지글 삭제 -->
+<delete id="GI_Delete" parameterType="java.lang.String">
+DELETE FROM GONGGI
+   WHERE GI_SEQ = #{gi_seq}
+</delete>
+
+
+</mapper>

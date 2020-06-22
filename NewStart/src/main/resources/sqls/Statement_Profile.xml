@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.Profile">
+
+	<!-- 프로필 조회하기 -->
+	<select id="searchProfile" parameterType="java.lang.String" resultType="ProDto">
+		SELECT USER_SEQ, PRO_SCHOOL, PRO_MAJOR, PRO_TECH, PRO_INFO, 
+					(SELECT TO_CHAR(SUM(RE_STAR)/COUNT(*),'FM9999.9')
+						FROM REVIEWBOARD
+						GROUP BY RE_TEACHER
+						HAVING RE_TEACHER =#{user_seq})  PRO_STAR		
+			FROM PROFILE 
+				WHERE USER_SEQ =#{user_seq}
+	</select>
+	<select id="searchCareer" parameterType="java.lang.String" resultType="CarDto">
+		SELECT USER_SEQ, CAREER_COMPANY, CAREER_DEPT, CAREER_JOB, CAREER_TERM
+			FROM  CAREER 
+				WHERE USER_SEQ =#{user_seq}
+	</select>
+	
+	<!-- 프로필 등록 -->
+	<!-- 프로필 등록 -->
+	<insert id="insertProfile" parameterType="ProDto">
+		INSERT INTO PROFILE
+			(USER_SEQ, PRO_SCHOOL, PRO_MAJOR, 
+			 PRO_TECH, PRO_INFO)
+		VALUES(#{user_seq}, #{pro_school}, #{pro_major}, 
+			   #{pro_tech}, #{pro_info})
+	</insert>
+	<!-- 경력 등록 -->
+	<insert id="insertCareer" parameterType="CarDto">
+		INSERT INTO CAREER
+		(USER_SEQ, CAREER_COMPANY, CAREER_DEPT, CAREER_JOB, CAREER_TERM)
+		VALUES(#{user_seq}, #{career_company}, #{career_dept}, 
+			   #{career_job},#{career_term})
+	</insert>
+	
+
+
+	<!-- 프로필 수정 -->
+	<!-- 프로필 수정 -->
+	<update id="updateProfile" parameterType="ProDto">
+		UPDATE PROFILE
+		SET PRO_SCHOOL=#{pro_school}, PRO_MAJOR=#{pro_major}, 
+		    PRO_TECH=#{pro_tech}, PRO_INFO=#{pro_info}
+		WHERE USER_SEQ=#{user_seq}
+	</update>
+	<!-- 경력 수정 -->
+	<update id="updateCareer" parameterType="CarDto">
+		UPDATE CAREER SET CAREER_COMPANY=#{career_campany}, CAREER_DEPT=#{career_dept},
+			CAREER_JOB=#{career_job}, CAREER_TERM=#{career_term}
+		WHERE USER_SEQ=#{user_seq}
+	</update>
+	
+	<select id="avgStar" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT TO_CHAR(SUM(RE_STAR)/COUNT(*),'FM9999.9')
+			FROM REVIEWBOARD
+			GROUP BY RE_TEACHER
+			HAVING RE_TEACHER =#{re_teacher}
+	</select>
+</mapper>
+
+
+
+
+
+
+
+
+
+

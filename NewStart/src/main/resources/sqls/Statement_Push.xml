@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.push">
+
+<!-- 필요기능 1. 새로운 알림 등록 기능 -->
+<insert id="AlramInsert" parameterType="PushDto">
+INSERT INTO PUSHALARM
+(ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER)
+VALUES(#{admin_seq}, #{push_title}, #{push_content}, #{push_accident}, NOW(), #{push_am}, 'U', #{push_touser})
+</insert>
+
+
+
+<!-- 필요기능 2. 전체 알림 조회 기능 -->
+<select id="AlramList" resultType="PushDto">
+SELECT PUSH_SEQ, ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER
+	FROM PUSHALARM
+</select>
+
+
+<!-- 필요기능 3. 발생사건별 조회(조회 카테고리 선택할 수 있게 만들고 싶어서) -->
+<select id="AccidentSearch" parameterType="java.lang.String" resultType="PushDto">
+SELECT PUSH_SEQ, ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER 
+	FROM PUSHALARM
+	WHERE PUSH_ACCIDENT = #{push_accident}
+</select>
+
+
+<!-- 필요기능 4. 알림 상세조회 기능(PUSH_SEQ로 조회 하기) -->
+<select id="AlramDetail" parameterType="java.lang.String" resultType="PushDto">
+SELECT PUSH_SEQ, ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER
+	FROM PUSHALARM
+	WHERE PUSH_SEQ = #{push_seq}
+</select>
+
+
+<!-- 필요기능 5. 알림 삭제기능 (상태를 발송완료 상태로 전환시키기) -->
+<update id="AlramDelete" parameterType="java.lang.String">
+UPDATE PUSHALARM
+SET PUSH_STATE='F'
+WHERE PUSH_SEQ=#{push_seq}
+</update>
+
+
+
+<!-- 필요기능 6. 알림 일시정지 기능 (상태를 발송완료 상태로 전환시키기) -->
+<update id="AlramStop" parameterType="java.lang.String">
+UPDATE NEW_START.PUSHALARM
+SET PUSH_STATE='L'
+WHERE PUSH_SEQ=#{push_seq}
+</update>
+
+
+
+<!-- 필요기능 7. 알림 다시 시작 기능 (상태를 발송완료 상태로 전환시키기) -->
+<update id="AlramRestart" parameterType="java.lang.String">
+UPDATE PUSHALARM
+SET PUSH_STATE='U'
+WHERE PUSH_SEQ=#{push_seq}
+</update>
+
+
+
+<!-- 필요기능 8. PUSH_STATE(알림 상태(예약 발송 중, 일시정지, 발송완료))에 따른 조회 (수동) -->
+<select id="PushState_select" parameterType="java.lang.String" resultType="PushDto">
+SELECT PUSH_SEQ, ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER 
+	FROM PUSHALARM
+	WHERE PUSH_STATE = #{push_state}
+</select>
+
+
+
+<!-- 필요기능 9. PUSH_AM(자동 수동)에 따른 조회 -->
+<select id="AutoMenual_select" parameterType="java.lang.String" resultType="PushDto">
+SELECT PUSH_SEQ, ADMIN_SEQ, PUSH_TITLE, PUSH_CONTENT, PUSH_ACCIDENT, PUSH_DATE, PUSH_AM, PUSH_STATE, PUSH_TOUSER 
+	FROM PUSHALARM
+	WHERE PUSH_AM = #{push_am}
+</select>
+
+
+<!-- 필요기능 10. 자동알림 수정 기능 -->
+<update id="AutoAlram_Update" parameterType="PushDto">
+UPDATE PUSHALARM SET
+ADMIN_SEQ = #{admin_seq}, PUSH_TITLE = #{push_title}, PUSH_CONTENT = #{push_content}, 
+PUSH_ACCIDENT = #{push_accident}, PUSH_TOUSER = #{push_touser}
+WHERE PUSH_SEQ=#{push_seq}
+</update>
+
+
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.start.pro.bidding">
+
+
+<!-- 필요기능 1. 입찰하기(GONGO테이블 업데이트 필요 입찰자 유무 조회에서 Y로 바꾸기) -->
+<insert id="bidding_insert" parameterType="BiddingDto">
+INSERT INTO BIDDING
+(GONGGO_SEQ, BOARD_CODE, BIDDINGER, BIDDINGER_W, BIDDING_COST)
+VALUES(#{gonggo_seq}, 2000, #{biddinger}, #{biddinger_w}, #{biddinger})
+</insert>
+<!-- 필요기능 1-1. GONGO테이블 업데이트 필요 입찰자 유무 조회에서 Y로 바꾸기 -->
+<update id="bidding_update" parameterType="java.lang.String">
+UPDATE GONGO 
+	SET BIDDING = 'Y'
+	WHERE GONGGO_SEQ=#{gonggo_seq} AND BOARD_CODE=2000
+</update>
+
+
+
+
+<!-- 필요기능 2. 해당 공고의 전체 입찰 내역(매칭 성공하기 전 까지) -->
+<select id="bidding_list" parameterType="java.util.Map" resultType="BiddingDto">
+SELECT BIDDING_SEQ, GONGGO_SEQ, BOARD_CODE, BIDDINGER, BIDDINGER_W, BIDDING_COST
+	FROM BIDDING b WHERE
+	<if test="gonggo_seq != null">
+	 GONGGO_SEQ = #{gonggo_seq} AND
+	</if>
+	BOARD_CODE = 2000
+</select>
+
+</mapper>

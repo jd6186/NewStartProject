@@ -1,0 +1,54 @@
+이미지 미리보기는 HTML 표준을 따라가야 만들수 있다.
+
+
+var inputImg = document.getElementById('imgInput');
+inputImg.onchange = function(e){
+	var files = e.target.result;	
+	// 여러개라면 files 
+	// 한개라면 files[0]
+	{
+		name : 파일이름
+		size : 바이트단위 파일 크기
+		올린시간 : 밀리 세컨드 단위로 나옴
+		type : image.png 같이 .png같은 것
+	}	
+	
+	// CS5에서 등장한 객체들
+	readAsDataURL(base64 언어체계) 
+	readAsText(text)
+	readAsArrayBuffer : (데이터의 크기를 일정한 크기로 조금씩 보냄)
+	readAsBinaryString : 파일같은걸 보낼 때 사용한다.
+	**** 위에 객체는 바로 읽어지지 않는다.
+	반드시 onload 이벤트 핸들러를 불러서 callback으로 파일을 다 읽었다고 알려줘야한다.
+	
+}	
+
+// 이미지 업로드를 위해 commons를 dependency걸고나서 servlet.context에 bean생성하기
+<bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+
+//signUpForm.jsp에 해당 form태그 추가해주기
+<form action="./multipartFormData" method="post"
+
+PROFILEIMG
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
