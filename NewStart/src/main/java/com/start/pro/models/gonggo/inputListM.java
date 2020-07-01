@@ -70,30 +70,13 @@ public class inputListM {
 
 	// 출력 리스트 폼
 	private String listForm(DTO_Gonggo dto) {
-		
-		System.out.println("inputList시작합니다. : \t{}");
-		System.out.println("DTO_Gonggo : \t{}" + dto);
-		System.out.println("DTO_User : \t{}" + users);
 		StringBuffer buf = new StringBuffer();
 		
 		// 공고글을 작성한 작성자 등급 불러오기
 		String user_seqs = dto.getUser_seq();
-		System.out.println(user_seqs);
-		
-		
-		
 		// colspan의 기본 user 종류별로 구분
-			System.out.println("유저쪽으로 유입 : \t{}" + dto);
 			int n = 7;
-			
-			// TODO
-			// 나중에는 newstart에서 유저 정보 빼내가지고 users.getUser_seq대신에 접속한  유저의 seq를 넣어주어야도니다.
-			// session.getAttribute("newstart");
-			System.out.println("users.getUser_seq() : " + users.getUser_seq() + " dto.getUser_seq() : " + dto.getUser_seq());
-			
-			System.out.println(users.getUser_seq().equalsIgnoreCase(dto.getUser_seq()) && dto.getFileox().equalsIgnoreCase("Y"));
 			if(dto.getFileox().equalsIgnoreCase("Y")) {
-				
 				buf.append("<tr><td colspan='6'><div>");
 				buf.append("<input type='hidden' name='Gonggo_seq' id='Gonggo_seq' value='"+dto.getGonggo_seq()+"'>");
 				buf.append("<input type='hidden' name='title' id='title' value='"+dto.getGonggo_title()+"'>");
@@ -109,7 +92,6 @@ public class inputListM {
 				buf.append("</td>");
 				buf.append("<td>" + dto.getUser_seq() + "</td>");
 				buf.append("<td>" + dateFormat(dto.getGonggo_time()) + "</td>");
-				n = 7;
 				buf.append("<td>" + dto.getFileox() + "</td>");
 				buf.append("</tr>");
 				buf.append("<tr>");
@@ -132,18 +114,15 @@ public class inputListM {
 							+ dto.getGonggo_seq() + "\")'>");
 				}
 				buf.append("<br/>");
-
 				if(users.getUser_grade().equalsIgnoreCase("T")) {
 					buf.append("<input class='btn btn-primary btn-center' name='bidding_btn"+dto.getGonggo_seq()+"' type='button' value='입찰하기' onclick='bidding(\""
 							+ dto.getGonggo_seq() + "\")'>");
 				}
-				
 				buf.append("</div>");
 				buf.append("</div>");
 				buf.append("</div>");
 				buf.append("</td>");
 				buf.append("</tr>");
-				
 				return buf.toString();
 			} else {
 				return "실패";

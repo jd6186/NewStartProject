@@ -25,12 +25,12 @@
 	<!-- 파일 업로드 -->
 	<insert id="insertFile" parameterType="FileDto">
 		INSERT INTO FILEBOARD
-		(FILE_SEQ, FILEBOARD, BOARD_SEQ,
+		(FILEBOARD, BOARD_SEQ,
 		FILENAME, FILEREALNAME, FILEURL,
 		FILEDATE, FILETYPE
 		)
-		VALUES(FILE_SEQS.NEXTVAL, #{fileboard}, #{board_seq},
-		#{filename}, #{filerealname}, #{fileurl}, SYSDATE, #{filetype})
+		VALUES(#{fileboard}, #{board_seq},
+		#{filename}, #{filerealname}, #{fileurl}, NOW(), #{filetype})
 	</insert>
 	
 	<!-- 파일 조회 -->

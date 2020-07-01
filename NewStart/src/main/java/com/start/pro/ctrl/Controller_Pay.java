@@ -76,7 +76,13 @@ public class Controller_Pay {
 		StringBuilder responseBody = new StringBuilder();
 		
 		int a = service.selectMax();
-		int orderNo = a + 1;
+		int orderNo;
+		if (a == 0) {
+			orderNo = 1000110111;
+		} else {
+			orderNo = a + 1;
+		}
+		
 		
 		try {
 			
@@ -93,9 +99,9 @@ public class Controller_Pay {
 			jsonBody.put("productDesc", "테스트 결제");
 			jsonBody.put("autoExecute", true);
 			jsonBody.put("apiKey", "sk_test_w5lNQylNqa5lNQe013Nq");
-			jsonBody.put("resultCallback", "http://localhost:8093/NewStart/callback.do");
-		    jsonBody.put("retUrl", "http://localhost:8093/NewStart/main.do?orderno=" + orderNo);
-		    jsonBody.put("retCancelUrl", "http://localhost:8093/NewStart/exit.do");
+			jsonBody.put("resultCallback", "https://proj-newstart-eovan.run.goorm.io/callback.do");
+		    jsonBody.put("retUrl", "https://proj-newstart-eovan.run.goorm.io/main.do?orderno=" + orderNo);
+		    jsonBody.put("retCancelUrl", "https://proj-newstart-eovan.run.goorm.io/exit.do");
 
 			BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
 			
@@ -130,9 +136,9 @@ public class Controller_Pay {
 		System.out.println("잘담기나요??"+checkoutPage);
 		
 		DTO_User user = (DTO_User) session.getAttribute("newstart");
-		DTO_Pay dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
-		
-		service.createPay(dto);
+//		DTO_Pay dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+//		
+//		service.createPay(dto);
 		
 		model.addAttribute("payed", checkoutPage);
 		session.setAttribute("token", token);
@@ -142,6 +148,7 @@ public class Controller_Pay {
 		String u = user.getUser_seq();
 		int cnt = Integer.parseInt(u);
 		
+		DTO_Pay dto = null;
 		DTO_Credit dtoo = null;
 		int sel = Integer.parseInt(selCash);
 		
@@ -151,8 +158,12 @@ public class Controller_Pay {
 			int credit = 10;
 			if (user.getUser_pchk().equalsIgnoreCase("Y")) {
 				int cre = service.updateCredit(cnt);
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+				service.createPay(dto);
 				dtoo = new DTO_Credit(credit, cre + credit, cnt);
 			} else {	
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "N");
+				service.createPay(dto);
 				service.payChk(cnt);
 				dtoo = new DTO_Credit(credit, credit, cnt);
 			}
@@ -161,8 +172,12 @@ public class Controller_Pay {
 			int credit = 50;
 			if (user.getUser_pchk().equalsIgnoreCase("Y")) {
 				int cre = service.updateCredit(cnt);
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+				service.createPay(dto);
 				dtoo = new DTO_Credit(credit, cre + credit, cnt);
-			} else {	
+			} else {
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "N");
+				service.createPay(dto);
 				service.payChk(cnt);
 				dtoo = new DTO_Credit(credit, credit, cnt);
 			}
@@ -171,8 +186,12 @@ public class Controller_Pay {
 			int credit = 100;
 			if (user.getUser_pchk().equalsIgnoreCase("Y")) {
 				int cre = service.updateCredit(cnt);
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+				service.createPay(dto);
 				dtoo = new DTO_Credit(credit, cre + credit, cnt);
-			} else {	
+			} else {
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "N");
+				service.createPay(dto);
 				service.payChk(cnt);
 				dtoo = new DTO_Credit(credit, credit, cnt);
 			}
@@ -181,8 +200,12 @@ public class Controller_Pay {
 			int credit = 200;
 			if (user.getUser_pchk().equalsIgnoreCase("Y")) {
 				int cre = service.updateCredit(cnt);
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+				service.createPay(dto);
 				dtoo = new DTO_Credit(credit, cre + credit, cnt);
 			} else {
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "N");
+				service.createPay(dto);
 				service.payChk(cnt);
 				dtoo = new DTO_Credit(credit, credit, cnt);
 			}
@@ -191,8 +214,12 @@ public class Controller_Pay {
 			int credit = 500;
 			if (user.getUser_pchk().equalsIgnoreCase("Y")) {
 				int cre = service.updateCredit(cnt);
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "Y");
+				service.createPay(dto);
 				dtoo = new DTO_Credit(credit, cre + credit, cnt);
-			} else {	
+			} else {
+				dto = new DTO_Pay(0, token, orderNo, selCash, null, user.getUser_seq(), "N");
+				service.createPay(dto);
 				service.payChk(cnt);
 				dtoo = new DTO_Credit(credit, credit, cnt);
 			}

@@ -16,7 +16,7 @@ SELECT GONGGO_SEQ, BOARD_CODE, g.USER_SEQ, GONGGO_TITLE,
 <insert id="gonggo_insert" parameterType="GGDto">
 INSERT INTO GONGO
 (BOARD_CODE, USER_SEQ, GONGGO_TITLE, GONGGO_CONTENT, BIDDING, GONGGO_TIME, VIEWS, FILEOX, GONGO_COST)
-VALUES(2000, #{user_seq}, #{gonggo_title}, #{gonggo_content}, 'N', SYSDATE, 0, 'Y', #{gongo_cost})
+VALUES(2000, #{user_seq}, #{gonggo_title}, #{gonggo_content}, 'N', NOW(), 0, 'Y', #{gongo_cost})
     <selectKey resultType="java.lang.String" keyProperty="gonggo_seq" order="AFTER">
         SELECT MAX(GONGGO_SEQ)
         	FROM GONGO

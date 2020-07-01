@@ -5,14 +5,9 @@
 <head>
 <title>Web Socket Example</title>
 </head>
-<script type="text/javascript" src="./js/chatting.js"></script>
-
-
-
-
-
 <body>
 	<%@include file="/WEB-INF/views/boardTopMenu.jsp"%>
+<script type="text/javascript" src="./js/chatting.js"></script>
 <div id="modify">
 	<form>
 		<!-- 유저 명을 입력하는 텍스트 박스(기본 값은 anonymous(익명)) -->
@@ -20,7 +15,7 @@
 		<div class='form-group'>
 			<label for='content'>유저 이름</label>
 			<br/>
-			<input id="user" type="text" value="연결된 유저   => ${user_seq}" style="width: 100%" readonly="readonly">
+			<input id="user" type="text" value="연결된 유저 : ${user_seq}" style="width: 100%" readonly="readonly">
 		</div>
 	<br/>
 		<div class='form-group'>
@@ -47,7 +42,7 @@
 	// 「broadsocket」는 호스트 명
 	
 	// WebSocket 오브젝트 생성 (자동으로 접속 시작한다. - onopen 함수 호출)
-	var webSocket = new WebSocket("ws://localhost:8093/20200511_Spring/broadsocket");
+	var webSocket = new WebSocket("ws://localhost:8093/NewStart/broadsocket");
 	
 	
 	// 콘솔 텍스트 에리어 오브젝트

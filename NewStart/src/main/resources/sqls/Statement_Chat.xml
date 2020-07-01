@@ -54,12 +54,9 @@ DELETE CHATLIST WHERE CHAT_SEQ = (
 전체 채팅방 리스트 들고가서 나한테 해당되는 애들만 출력할 수 있게 json으로 되어 있는 USER_SEQ와 jstl의 fn태그를 적극 활용해봐
   -->	
 <select id="Chat_List" resultType="ChatListDto">
- <![CDATA[	
 SELECT CHAT_SEQ, USER_SEQ, CHATTITLE, CREATEDATE, LASTCHAT
 FROM CHATLIST
-WHERE NOW() - CREATEDATE < 14 
 ORDER BY LASTCHAT DESC
-]]>		
 </select>
 		
 		
@@ -68,7 +65,7 @@ ORDER BY LASTCHAT DESC
 <insert id="Chat_Open" parameterType="ChatListDto">		
 INSERT INTO CHATLIST
 (USER_SEQ, CHATTITLE, CREATEDATE, LASTCHAT)
-VALUES(#{user_seq}, #{chattitle} || '님과의 대화', NOW(), NOW())
+VALUES(#{user_seq}, '새로운 대화', NOW(), NOW())
 </insert>
 		
 <!-- 필요기능 3. LASTCHAT 업데이트 해주기 (채팅을 보내거나 상대 채팅이 오면 올 때마다 해당 시간으로 업데이트 해주기)
