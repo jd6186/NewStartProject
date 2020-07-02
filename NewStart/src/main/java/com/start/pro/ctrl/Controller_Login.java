@@ -46,25 +46,16 @@ public class Controller_Login {
 	
 	//로그인창 
 	@RequestMapping(value = "/loginForm.do", method = {RequestMethod.GET,RequestMethod.POST})
-	public String loginForm(@RequestParam(value = "id", required = false) String id,
+	public String loginForm(
 			HttpServletRequest req, Model model) {
 
 		ServletContext app = req.getSession().getServletContext();
 		Object cnt = app.getAttribute("failchk");
-		System.out.println("로그인 폼 갑니당"+cnt);
-		if(cnt != null) {
-			if((Integer)cnt >= 5) {
-				
+
+		if(cnt != null && (Integer)cnt >= 5) {
 			String key = getKey.get("0");
 			model.addAttribute("key", key);
-			}
 		}
-		
-
-		if(id != null) {
-			model.addAttribute("id", id);
-		}
-
 
 		return "login/LoginForm_cham";
 	}
@@ -77,13 +68,11 @@ public class Controller_Login {
 		if(grade != null) {
 			if(grade.equalsIgnoreCase("H")) {
 				emailSend.LJMail("2", ((DTO_User)session.getAttribute("newstart")).getUser_email());
-				System.out.println("휴먼");
-				
 				return "login/Human";
+			
 			}else {
 				return "login/EmailChk";
 			}
-			
 		}else {
 			return "login/LoginForm_cham";
 		}
@@ -95,7 +84,7 @@ public class Controller_Login {
 	//회원가입 완료시
 	@RequestMapping(value = "/singUpSc.do", method = RequestMethod.POST)
 	public String singUpSc(DTO_User dto) {
-		System.out.println(dto.toString());
+
 		service.signUp(dto);
 		
 		emailSend.LJMail("0", dto.getUser_email());
@@ -106,8 +95,7 @@ public class Controller_Login {
 	//로그인 완료시
 	@RequestMapping(value = "/loginResult.do", method = RequestMethod.GET)
 	public String loginResult(HttpSession session, Authentication auth, Model model) {
-//		System.out.println(session.getAttribute("user").toString());
-//		System.out.println(auth.toString());
+
 		DTO_User newstart = (DTO_User) session.getAttribute("user");
 		model.addAttribute("dto",newstart);
 		
@@ -117,14 +105,12 @@ public class Controller_Login {
 	//회원가입쪽으로1
 	@RequestMapping(value = "/singUpform1.do", method = RequestMethod.GET)
 	public String singUpform1() {
-		System.out.println("dd");
 	
 		return "login/SignUp1_cham";
 	}
 	
 	@RequestMapping(value = "/singUpform.do", method = RequestMethod.GET)
 	public String singUpForm(String[] user_adchk,Model model) {
-		System.out.println("dd");
 		
 		if(user_adchk.length == 2) {
 			model.addAttribute("user_adchk","N");
@@ -138,13 +124,13 @@ public class Controller_Login {
 	//아이디찾자
 	@RequestMapping(value = "/goFId.do", method = RequestMethod.GET)
 	public String goFId() {
+
 		return "login/FindId1";
 	}
 	
 	///FindId.do
 	@RequestMapping(value = "/FindId.do", method = RequestMethod.GET)
 	public String FindId(Model model,String user_phone, HttpServletResponse resp) throws IOException {
-		System.out.println("phone");
 		
 		String id = service.findId(user_phone);
 
@@ -186,6 +172,7 @@ public class Controller_Login {
 	
 	@RequestMapping(value = "/ChangePW.do", method = RequestMethod.POST)
 	public String ChangePW(String email, String newPW, Model model) {
+
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user_email", email);
 		map.put("user_pw", newPW);
@@ -199,7 +186,9 @@ public class Controller_Login {
 	// 중복검사
 	@RequestMapping(value = "/idChk.do", method = RequestMethod.GET)
 	public String idChk() {
+		
 		return "login/MultiChkId";
+	
 	}
 	
 	//./MultiChkId.do
@@ -209,6 +198,7 @@ public class Controller_Login {
 	// 휴면회원을 일반회원으로 등급변경(이메일 인증시)
 	@RequestMapping(value = "/changeN.do", method = RequestMethod.GET)
 	public String changeN(String seq) {
+	
 		service.changeSleep(seq);
 		return "login/LoginForm_cham";
 	}
@@ -231,6 +221,7 @@ public class Controller_Login {
 	// 잠금계정 풀기(이메일 인증시)
 	@RequestMapping(value = "/UnLock.do", method = RequestMethod.GET)
 	public String UnLock(String seq) {
+		
 		service.changeNomal(seq);
 		return "login/LoginForm_cham";
 	}

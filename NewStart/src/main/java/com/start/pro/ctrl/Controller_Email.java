@@ -43,14 +43,12 @@ public class Controller_Email {
 	@RequestMapping(value = "/Atestmail.do", method = RequestMethod.GET)
 	public String test() {
 
-//		emailSend.ddd();
 		return "email/ManyMail";
 	}
 
 	// 메일 보내기
 	@RequestMapping(value = "/ljmail.do", method = RequestMethod.GET)
 	public String LJ_Email(String code, String email, HttpServletResponse resp) {
-		System.out.println("숑");
 
 		DTO_Email dto = service.SelDetailAuto(code);
 
@@ -63,7 +61,7 @@ public class Controller_Email {
 		map.put("lj_key", "1234");
 		map.put("lj_code", code);
 		service.sendLJ(map);
-//		
+
 		emailSend.sendOneMail(dto, resp);
 
 		return "login/SignUp3";
@@ -72,14 +70,13 @@ public class Controller_Email {
 	// 메일 인증
 	@RequestMapping(value = "/ljmailchk.do", method = { RequestMethod.GET, RequestMethod.POST })
 	public String ljmailchk(String email, String key, Model model) {
-		System.out.println(email);
-		System.out.println(key);
+
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("user_email", email);
 		map.put("lj_key", key.trim());
 		String code = service.LJKey(map);
+		
 		if (code != null) {
-			System.out.println("인증되었습니다.");
 			switch (code) {
 			case "0":
 				loginservice.changeNomal(email);
@@ -94,7 +91,6 @@ public class Controller_Email {
 				return "login/LJError";
 			}
 		} else {
-			System.out.println("인증실패");
 			return "login/LJError";
 		}
 	}
@@ -123,13 +119,10 @@ public class Controller_Email {
 	@RequestMapping(value = "/AutomailUp.do", method = RequestMethod.POST)
 	public void AutomailUp(DTO_Email dto, HttpServletResponse resp) throws IOException {
 
-		System.out.println("??" + dto.toString());
 		service.UpdateAuto(dto);
 
 		resp.setCharacterEncoding("utf-8");
 	    resp.setContentType("text/html; charset=UTF-8");
-
-		
 		
 	    PrintWriter	out = resp.getWriter();
 		out.println("<script>alert('수정 완료되었습니다');  location.href='./AutomailB.do'; </script>");
@@ -149,8 +142,6 @@ public class Controller_Email {
 	@RequestMapping(value = "/Amanymailget.do", method = RequestMethod.POST)
 	public String manymailget(DTO_Email dto) {
 
-		System.out.println(dto.toString());
-
 		return "email/ManyMail";
 	}
 
@@ -158,17 +149,10 @@ public class Controller_Email {
 	@RequestMapping(value = "/AManyMailSend.do", method = RequestMethod.POST)
 	public String ManyMailSend(DTO_Email dto, HttpServletResponse resp) {
 
-		System.out.println("받아옴??" + dto.toString());
-		//dto.setSuccesschk("S");
-		//dto.setCategory_code("1");
-		//service.SendEmail(dto);
-		System.out.println(dto.toString());
-		
 		dto.setSuccesschk("S");
 		dto.setCategory_code("1");
 		service.SendEmail(dto);
 		emailSend.sendManyMail(dto);
-
 
 		return "redirect:/AcheckMailSave.do";
 	}
@@ -177,7 +161,6 @@ public class Controller_Email {
 	@RequestMapping(value = "/AcheckMailSave.do", method = RequestMethod.GET)
 	public String AcheckMailSave(Model model, HttpSession session) {
 
-//		List<DTO_Email> dtos = service.SelAllMail();
 		List<DTO_Email> dtos = null;
 		DTO_Paging pdto = null;
 		
@@ -191,11 +174,8 @@ public class Controller_Email {
 		fdto.setStart(String.valueOf(pdto.getStart()));
 		fdto.setLast(String.valueOf(pdto.getlast()));
 		
-		System.out.println("왜 1111떠??"+fdto.toString());
-		
 		pdto.setTotal(service.getEmailCount(null));
 		dtos = service.SelAllMail(fdto);
-		System.out.println(pdto.toString());
 		model.addAttribute("row", pdto);
 		model.addAttribute("dtos", dtos);
 
@@ -231,13 +211,10 @@ public class Controller_Email {
 
 		Map<String,String[]> map = new HashMap<String, String[]>();
 		map.put("seq", seq);
-		System.out.println(map.toString());
 		service.delemailsave(map);
 		
 		resp.setCharacterEncoding("utf-8");
 	    resp.setContentType("text/html; charset=UTF-8");
-
-		
 		
 	    PrintWriter	out = resp.getWriter();
 		out.println("<script>alert('삭제 되었습니다.');  location.href='./AcheckMailSave.do'; </script>");
@@ -252,7 +229,6 @@ public class Controller_Email {
 	public String resend(Model model, String seq) {
 
 		DTO_Email dto = service.mailresend(seq);
-		System.out.println("머가 들었길래 안나와" + dto.toString());
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("email_seq", dto.getEmail_seq());
 		map.put("successchk", "S");
@@ -262,10 +238,5 @@ public class Controller_Email {
 
 		return "redirect:/AcheckMailSave.do";
 	}
-
-
-
-
-
 
 }

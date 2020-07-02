@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +33,7 @@ public class RestController_Email {
 	@RequestMapping(value = "/SelMailFilter.do", method = RequestMethod.POST)
 	public List<DTO_Email> SelMailFilter(DTO_Filter dto, DTO_Paging pdto) {
 
-		System.out.println(dto.toString());
-		System.out.println(pdto.toString());
 		List<DTO_Email> edto = service.SelMailFilter(dto);
-		System.out.println(edto.toString());
 
 		return edto;
 	}
@@ -46,7 +42,6 @@ public class RestController_Email {
 	@RequestMapping(value = "/getuserEmails.do", method = RequestMethod.POST)
 	public String getuserEmails(String user_grade) {
 
-		System.out.println("???" + user_grade);
 		// 'M',''T
 		Map<String, String> map = new HashMap<String, String>();
 
@@ -65,9 +60,6 @@ public class RestController_Email {
 	public String emailPaging(DTO_Filter fdto, DTO_Paging dto,  HttpSession session) {
 
 		JSONObject json = null;
-		System.out.println("페이징 할때 머머 받아와??"+fdto.toString());
-		System.out.println("페이징 할때 머머 받아와??"+dto.toString());
-		System.out.println(fdto.toString());	
 		dto.setTotal(service.getEmailCount(fdto));
 		fdto.setStart(String.valueOf(dto.getStart()));
 		fdto.setLast(String.valueOf(dto.getlast()));
@@ -77,8 +69,4 @@ public class RestController_Email {
 
 		return json.toString();
 	}
-
-	
-
-
 }

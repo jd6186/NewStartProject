@@ -5,7 +5,6 @@ var pageAjax = function(){
 	
 	httpRequest = new XMLHttpRequest(); // 서버와 통신
 	httpRequest.onreadystatechange = callback // 처리할 함수
-	//alert(httpRequest.onreadystatechange);	//상태번호 0 1 2 3 4
 	httpRequest.open("POST",url);	// 처리방식, url, 비동기여부(비동기면 true)(select제외 다 동기식으로 해라)
 	httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 	httpRequest.send(getParameterValues());			
@@ -13,18 +12,14 @@ var pageAjax = function(){
 }
 
 function callback(){
-	//alert("readyState : "+httpRequest.readyState);
-	//readyState가 4면 성공 complete
+
 	if(httpRequest.readyState == 4){
-		//alert("status : "+httpRequest.status);
 		//서버와의 통신을 통해 정상적인 작동으로 완료 됐다면 200을 반환
 		if(httpRequest.status == 200){
-			//서버에서 받은 JSON Data를 받아서 OGNL로 분석해서 화면의 값으로 만들어줌
-			//alert("결과값" + httpRequest.responseJson);
+
 			var result = JSON.parse(httpRequest.responseText);
 			
 			for(key in result){
-//				alert(key+":"+result[key]);
 				if(key == "lists"){
 					var html = '';
 					if(result[key].length > 0){
@@ -62,7 +57,6 @@ function callback(){
 				    html +="<li><a href='#' onclick='pageNext("+result[key].pageNum+","+result[key].total+","+result[key].listNum+","+result[key].pageList+")'>&rsaquo;</a></li>";
 				    html +="<li><a href='#' onclick='pageLast("+result[key].pageNum+","+result[key].total+","+result[key].listNum+","+result[key].pageList+")'>&raquo;</a></li>";
 				    
-				   // alert(html);
 				    document.getElementsByClassName('pagination')[0].innerHTML=html;
 				}
 				
@@ -87,7 +81,7 @@ function getParameterValues(){
 }
 
 function pageIndex(idx){
-//	alert(idx);
+
 	var index = document.getElementById('index');
 	index.value = idx-1;
 	
@@ -96,7 +90,7 @@ function pageIndex(idx){
 
 //< 버튼
 function pagePre(num, pageList){
-//	alert(pageNum+":"+pageList);
+
 	if(0<(num - pageList)){
 		num -= pageList;
 		var index = document.getElementById('index');
@@ -110,10 +104,7 @@ function pagePre(num, pageList){
 
 //>
 function pageNext(num, total, listNum, pageList){
-//	alert(num);
-//	alert(total);
-//	alert(listNum);
-//	alert(pageList);
+
 	var index = Math.ceil(total/listNum); // 30/5 6개의 페이지가 있음 123456
 	var max = Math.ceil(index/pageList); // 6/5 두 그룹으로 나눌 수 있음 12345 6
 	
@@ -148,7 +139,7 @@ function pageLast(num, total, listNum, pageList){
 
 
 function pageList(){
-//alert("dd");
+
 	var index = document.getElementById('index'); // 페이지 번호
 	var pageNum = document.getElementById('pageNum'); // 페이지 목록
 	var listNum = document.getElementById('listNum'); // 뿌려지는 게시글 수
@@ -156,18 +147,14 @@ function pageList(){
 	index.value = 0;
 	pageNum.value = 1;
 	listNum.value = document.getElementById('list').value;
-//alert(index.value + ":" + pageNum.value + ":" + listNum.value);
 	
 	var selList = document.getElementById('list');
-//alert(selList.selectedIndex);
-//	selList.options[selList.selectedIndex].setAttribute("selected", "selected");
-//	selList.reload();
 	
 	pageAjax();
 }
 
 function pageFirst(){
-//	alert("작동");
+
 	var index = document.getElementById("index");
 	var pageNum = document.getElementById("pageNum");
 	index.value = 0;

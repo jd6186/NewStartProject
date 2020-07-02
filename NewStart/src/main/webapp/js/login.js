@@ -14,7 +14,6 @@ function ccchk(){
 	if(typeof key == 'undefined'){
 		$('form').submit();
 	}else{
-		//alert('캡챠 확인합니다');
 		getkey(key, chk);
 	}
 }
@@ -27,9 +26,7 @@ function getkey(key, chk){
 		data : {"key":key,"chk":chk},
 		dataType : "json",
 		success: function(data){
-			//alert(data.result);
 			if(data.result == true){
-				//alert('성공');
 				$('form').submit();
 			}else{
 				alert('캡챠를 확인해주세요');
@@ -78,7 +75,6 @@ function gosignUp(){
 		alert('필수항목에 모두 동의해주세요');
 		return;
 	}else{
-		//alert('넘어갑니다~');
 		 document.forms["formchk"].submit();
 	}
 }

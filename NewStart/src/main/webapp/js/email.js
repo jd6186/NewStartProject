@@ -1,8 +1,4 @@
 //---------------------------------------관리자 자동 이메일 게시판 상세보기----------------------------
-
-
-
-
 function gosubmit(){
 	
 	if(document.getElementById('title').value.trim() == ''){
@@ -14,9 +10,6 @@ function gosubmit(){
 		document.forms[0].submit();
 	}
 }
-
-
-
 //---------------------------------------관리자 이메일 기록 게시판----------------------------
 function pageList(){
 	function pageList(){
@@ -28,19 +21,10 @@ function pageList(){
 			index.value = 0;
 			pageNum.value = 1;
 			listNum.value = document.getElementById('list').value;
-		// alert(index.value + ":" + pageNum.value + ":" + listNum.value);
-			
-			//var selList = document.getElementById('list');
-		// alert(selList.selectedIndex);
-//			selList.options[selList.selectedIndex].setAttribute("selected", "selected");
-//			selList.reload();
-
 			
 			pageAjax();
 		}
 }
-
-
 
 function setSearchFilter(){
 	
@@ -78,8 +62,6 @@ function setSearchFilter(){
 	pageAjax();
 }
 
-
-
 var pageAjax = function(){
 	
 
@@ -93,8 +75,6 @@ var pageAjax = function(){
 	var listNum = document.getElementById('listNum').value;
 	
 	var success = successchkval.split(',');
-	
-	
 	
 	$.ajax({
 		url : "./emailPaging.do",
@@ -173,7 +153,7 @@ var pageAjax = function(){
 }
 
 function pageIndex(idx){
-//	alert(idx);
+
 	var index = document.getElementById('index');
 	index.value = idx-1;
 	
@@ -183,7 +163,7 @@ function pageIndex(idx){
 
 //< 버튼
 function pagePre(num, pageList){
-//	alert(pageNum+":"+pageList);
+
 	if(0<(num - pageList)){
 		num -= pageList;
 		var index = document.getElementById('index');
@@ -194,13 +174,8 @@ function pagePre(num, pageList){
 	pageAjax();
 }
 
-
-//>
 function pageNext(num, total, listNum, pageList){
-//	alert(num);
-//	alert(total);
-//	alert(listNum);
-//	alert(pageList);
+
 	var index = Math.ceil(total/listNum); // 30/5 6개의 페이지가 있음 123456
 	var max = Math.ceil(index/pageList); // 6/5 두 그룹으로 나눌 수 있음 12345 6
 	
@@ -233,9 +208,8 @@ function pageLast(num, total, listNum, pageList){
 }
 
 
-
 function pageList(){
-// alert("dd");
+
 	var index = document.getElementById('index'); // 페이지 번호
 	var pageNum = document.getElementById('pageNum'); // 페이지 목록
 	var listNum = document.getElementById('listNum'); // 뿌려지는 게시글 수
@@ -243,30 +217,22 @@ function pageList(){
 	index.value = 0;
 	pageNum.value = 1;
 	listNum.value = document.getElementById('list').value;
-// alert(index.value + ":" + pageNum.value + ":" + listNum.value);
 	
 	var selList = document.getElementById('list');
-// alert(selList.selectedIndex);
-//	selList.options[selList.selectedIndex].setAttribute("selected", "selected");
-//	selList.reload();
-	
 	pageAjax();
 }
 
 function pageFirst(){
-//	alert("작동");
 	var index = document.getElementById("index");
 	var pageNum = document.getElementById("pageNum");
 	index.value = 0;
 	pageNum.value = 1;
 	pageAjax();
 }
-
 //---------------------------------------대량 메일 보내기----------------------------
 function checkAll(bool){
-	//alert(name);
+	
 	var chkVals = document.getElementsByName('filter');
-	//Allfilter
 	document.getElementsByName('Allfilter').checked = bool;
 	for (var i = 0; i < chkVals.length; i++) {
 		chkVals[i].checked = bool;
@@ -279,13 +245,10 @@ function checkAll(bool){
 	}else{
 		document.getElementById('sendCnt').innerHTML = '총 발송 건 수 : 0통';
 	}
-	
-	
 }
 
 function chk(){
 	var chkbool = document.getElementsByName('filter');
-
 
 	var user_grade = [];
 	var cnt = 0;
@@ -307,10 +270,6 @@ function chk(){
 		}else{
 			document.getElementById('sendCnt').innerHTML = '총 발송 건 수 : 0통';
 		}
-	
-		
-		
-		
 }
 
 function chkCnt(user_grade){
@@ -324,8 +283,6 @@ function chkCnt(user_grade){
 		data : {"user_grade":user_grade},
 		dataType : "text",
 		success: function(data){
-			//alert(data);
-			//alert(data.split(',').length);
 			emailList.value = data;
 			sendCnt.innerHTML = '총 발송 건 수 : '+data.split(',').length+'통';
 		},
@@ -339,7 +296,6 @@ function gosubmit_email(){
 	
 	var chkbool = document.getElementsByName('filter');
 	var email_title = document.getElementsByName('email_title')[0];
-	//var email_content = document.getElementsByName('email_content')[0];
 	var email_content = CKEDITOR.instances['pwd'].getData();
 	alert(email_content);
 	var cnt = 0;
@@ -364,8 +320,3 @@ function gosubmit_email(){
 	}
 	
 }
-
-
-
-
-

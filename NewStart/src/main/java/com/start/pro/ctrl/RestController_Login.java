@@ -32,13 +32,8 @@ public class RestController_Login {
 	@RequestMapping(value = "/valchk.do", method = RequestMethod.POST)
 	public String chk(String chk, String key) {
 
-
-
-		System.out.println("아작스 실행??"+key+":"+chk);
-
 		String attach = "1&key="+key+"&value="+chk;
 		String result = valchk.get(attach);
-		System.out.println(result);
 
 		return result;
 	}
@@ -48,7 +43,6 @@ public class RestController_Login {
 	public String main() {
 		
 		String key = getKey.get("0");
-		System.out.println(key+"키 받아왔나요?");
 		
         return key;
          
@@ -56,7 +50,7 @@ public class RestController_Login {
 	
 	@RequestMapping(value = "/{pathval}/MultiChk.do", method = RequestMethod.POST)
 	public boolean MultiChk(@PathVariable String pathval, String val) {
-		System.out.println(pathval+":"+val);
+
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(pathval, val);
 		boolean isc = service.MultipleChk(map);
