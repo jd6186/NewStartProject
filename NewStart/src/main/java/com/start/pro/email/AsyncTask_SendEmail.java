@@ -52,7 +52,7 @@ public class AsyncTask_SendEmail {
 	// 단일 메세지 전송
 	@Async("myex")
 	public void sendOneMail(DTO_Email dto, HttpServletResponse resp) {
-		System.out.println("비동기 들어왔어");
+
 		MimeMessage message = mailSender.createMimeMessage();
 		try {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
@@ -91,11 +91,8 @@ public class AsyncTask_SendEmail {
 
 	@Async("myex")
 	public void LJMail(String code, String email) {
-		System.out.println("비동기 들어왔어");
 
 		DTO_Email dto = service.SelDetailAuto(code);
-		System.out.println("잘가져왔어?"+dto.toString());
-
 		String key = randomKey();
 
 		String content = dto.getEmail_content();
@@ -128,14 +125,9 @@ public class AsyncTask_SendEmail {
 	@Async("myex")
 	public void sendManyMail(DTO_Email mailList) {
 
-		System.out.println("들어왓숑!");
-		System.out.println("이런게 왔당"+mailList.toString());
-
 		// 기존 
 		List<String> mails = jsonUtil.jsonToList(mailList.getUser_email(),"user_email");
-		
-		
-		
+
 		MimeMessagePreparator[] preparators = new MimeMessagePreparator[mails.size()];
 		int i = 0;
 		for (String mail : mails) {
@@ -156,7 +148,6 @@ public class AsyncTask_SendEmail {
 		}
 
 		mailSender.send(preparators);
-		System.out.println("다 보내졌어");
 
 		try {
 			Thread.sleep(3000);
@@ -170,8 +161,6 @@ public class AsyncTask_SendEmail {
 	//재전송
 	@Async("myex")
 	public void resend(DTO_Email mailList) {
-
-		System.out.println("들어왓숑!");
 
 		List<String> mails = jsonUtil.jsonToList(mailList.getUser_email(),"user_email");
 
@@ -192,7 +181,6 @@ public class AsyncTask_SendEmail {
 		}
 
 		mailSender.send(preparators);
-		System.out.println("다 보내졌어");
 
 		try {
 			Thread.sleep(3000);
@@ -231,11 +219,9 @@ public class AsyncTask_SendEmail {
 
 		folder.open(Folder.READ_WRITE); //읽고 쓰기 전용
 
-
 		Message[] msgArray = folder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
 
 		if(msgArray.length == 0) {
-			System.out.println("안읽은 메일이 없음");
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("email_seq", mailList.getEmail_seq());
 			map.put("successchk", "Y");
@@ -271,7 +257,6 @@ public class AsyncTask_SendEmail {
 
 				service.SendEmail(mailList);
 			}else {
-				System.out.println("다 실패 ㅡㅡ"+mailList.toString());
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("successchk", "F");
 				map.put("email_seq", mailList.getEmail_seq());
@@ -327,7 +312,6 @@ public class AsyncTask_SendEmail {
 				} else if(part.isMimeType("text/plain")){
 					String str = (String) part.getContent();
 					str = (str.substring(str.indexOf("to")+2, str.indexOf("because"))).trim();
-					System.out.println("실패한 메일 주소"+str);
 					if(str != null) {
 						failEmail = str;
 					}

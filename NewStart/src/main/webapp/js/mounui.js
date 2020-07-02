@@ -33,7 +33,6 @@ var pageAjax = function(){
 		dataType: "json",
 		success: function(msg){
 			
-			//alert(msg.adminMounuiBoardrow.listNum);
 			$.each(msg,function(key,value){
 				
 				if(key == "lists"){
@@ -110,7 +109,6 @@ function setsearchFilter(){
 }
 
 function pageIndex(idx){
-//	alert(idx);
 	var index = document.getElementById('index');
 	index.value = idx-1;
 	
@@ -119,7 +117,6 @@ function pageIndex(idx){
 
 //< 버튼
 function pagePre(num, pageList){
-//	alert(pageNum+":"+pageList);
 	if(0<(num - pageList)){
 		num -= pageList;
 		var index = document.getElementById('index');
@@ -133,10 +130,7 @@ function pagePre(num, pageList){
 
 //>
 function pageNext(num, total, listNum, pageList){
-//	alert(num);
-//	alert(total);
-//	alert(listNum);
-//	alert(pageList);
+
 	var index = Math.ceil(total/listNum); // 30/5 6개의 페이지가 있음 123456
 	var max = Math.ceil(index/pageList); // 6/5 두 그룹으로 나눌 수 있음 12345 6
 	
@@ -171,7 +165,7 @@ function pageLast(num, total, listNum, pageList){
 
 
 function pageList(){
-//alert("dd");
+
 	var index = document.getElementById('index'); // 페이지 번호
 	var pageNum = document.getElementById('pageNum'); // 페이지 목록
 	var listNum = document.getElementById('listNum'); // 뿌려지는 게시글 수
@@ -179,18 +173,14 @@ function pageList(){
 	index.value = 0;
 	pageNum.value = 1;
 	listNum.value = document.getElementById('list').value;
-//alert(index.value + ":" + pageNum.value + ":" + listNum.value);
 	
 	var selList = document.getElementById('list');
-//alert(selList.selectedIndex);
-//	selList.options[selList.selectedIndex].setAttribute("selected", "selected");
-//	selList.reload();
 	
 	pageAjax();
 }
 
 function pageFirst(){
-//	alert("작동");
+
 	var index = document.getElementById("index");
 	var pageNum = document.getElementById("pageNum");
 	index.value = 0;

@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,34 +45,26 @@ public class Controller_Mounui {
 		return "board/mounui/InsertBoard";
 	}
 	
+
 	//insertBoard
 	@RequestMapping(value = "/UinsertBoard.do", method = RequestMethod.POST)
 	public String insertBoard(DTO_Mounui dto, HttpSession session,Model model,
 			HttpServletResponse resp, @RequestParam(value="file", required = false) List<MultipartFile> report)
 					throws IOException{
 		
-		System.out.println("파일말고 글은 다 들어오나요?"+dto.toString());
-		
-		System.out.println("파일 몇개 들어왔어??"+report.size());
-		
 		DTO_User user = (DTO_User) session.getAttribute("newstart");
 		dto.setUser_seq(user.getUser_seq());
 		
 		if(report.size() > 0) {
-			System.out.println("파일있어");
 			dto.setFilechk("Y");
 			model.addAttribute("file", report);
 		}else {
-			System.out.println("파일없어");
 			dto.setFilechk("N");
 		}
 		
-		System.out.println(dto.toString());
-//		System.out.println(user.toString());
 		service.insertBoard(dto);
 		model.addAttribute("fileboard", "3000");
 		model.addAttribute("board_seq", dto.getMounui_seq());
-
 
 		return "redirect:/UserMBoard.do";
 	}
@@ -86,8 +77,6 @@ public class Controller_Mounui {
 		List<DTO_Mounui> dtos = null;
 		DTO_Paging pdto = null;
 		
-		
-		
 		if(session.getAttribute("userMounuiBoardrow")==null) {
 			pdto = new DTO_Paging();
 		}else {
@@ -95,6 +84,7 @@ public class Controller_Mounui {
 		}
 		
 		DTO_User user = (DTO_User) session.getAttribute("newstart");
+
 		//user_seq : 사용자의 seq
 		//start : 시작 글 번호 last : 끝 글 번호
 		pdto.setTotal(service.getUserMounuiBoard(user.getUser_seq()));
@@ -103,7 +93,6 @@ public class Controller_Mounui {
 		map.put("last", String.valueOf(pdto.getlast()));
 		
 		dtos = service.userBoard(map);
-		System.out.println(dtos.toString());
 		model.addAttribute("dtos", dtos);
 		model.addAttribute("userMounuiBoardrow", pdto);
 		
@@ -121,10 +110,6 @@ public class Controller_Mounui {
 			List<DTO_File> fdtolist = file_Service.searchFile2(fdto);
 			model.addAttribute("files",fdtolist);
 		}
-		
-		
-		System.out.println("왜안돼"+dto.toString());
-		
 		model.addAttribute("dto", dto);
 		return "board/mounui/UserMBoardD";
 	}
@@ -132,17 +117,16 @@ public class Controller_Mounui {
 	
 	@RequestMapping(value = "/UserMBoardDel.do", method = {RequestMethod.GET,RequestMethod.POST})
 	public void UserMBoardDel(String[] seq, HttpServletResponse resp) throws IOException {
+
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		map.put("seq", seq);
 		service.delBoard(map);
-		
-//		System.out.println(seq[0]);
+
 		resp.setCharacterEncoding("utf-8");
 	    resp.setContentType("text/html; charset=UTF-8");
 		PrintWriter	out = resp.getWriter();
 		out.println("<script>alert('삭제되었습니다.');location.href='./UserMBoard.do'; </script>");
 		out.flush();
-		
 	}
 
 	// 관리자 문의 게시판
@@ -163,7 +147,7 @@ public class Controller_Mounui {
 		fdto.setLast(String.valueOf(pdto.getlast()));
 		pdto.setTotal(service.getAdminMounuiCnt(null));
 		dtos = service.adminBoard(fdto);
-		System.out.println(dtos.toString());
+
 		List<String> title = service.getTitle();
 		model.addAttribute("dtos", dtos);
 		model.addAttribute("title", title);
@@ -187,14 +171,10 @@ public class Controller_Mounui {
 			model.addAttribute("files",fdtolist);
 		}
 		
-		System.out.println("왜안돼"+dto.toString());
-		
 		if(dto.getReplychk().equalsIgnoreCase("Y")) {
 			DTO_Email edto = service.getReply(seq);
 			model.addAttribute("edto", edto);
 		}
-		
-		
 		
 		model.addAttribute("dto", dto);
 		return "board/mounui/AdminMBoardD";

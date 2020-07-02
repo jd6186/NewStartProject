@@ -40,8 +40,6 @@ public class RestController_Mounui {
 	//문의 게시판 답장 메일 보내기
 	@RequestMapping(value = "/AReplySend.do", method = RequestMethod.POST)
 	public boolean MReplySend(DTO_Mounui dto, String user_email) throws IOException{
-
-		System.out.println("ck에디터 넘어와??"+dto.toString());
 		
 		if(emailSender.sendReplyMail(user_email, dto.getTitle(), dto.getContent())) {
 			dto.setDelchk("Y");
@@ -58,9 +56,7 @@ public class RestController_Mounui {
 	@RequestMapping(value = "/AdminMBoard.do", method = RequestMethod.POST)
 	public List<DTO_Mounui> AdminMBoard(DTO_Filter dto){
 		
-			System.out.println("문의 게시판 필터!!"+dto.toString());
 			List<DTO_Mounui> dtos = service.adminBoard(dto);
-			System.out.println(dtos.toString());
 		
 		return dtos;
 	}
@@ -69,12 +65,7 @@ public class RestController_Mounui {
 	@RequestMapping(value = "/AdminMBoardPaging.do", method = RequestMethod.POST, produces = "application/text; charset=UTF-8;")
 	public String AdminMBoardPaging(DTO_Filter fdto, DTO_Paging dto,  HttpSession session){
 		
-		
-		System.out.println("어케들어오노"+fdto.toString());
-		
 		JSONObject json = null;
-		System.out.println("페이징 할때 머머 받아와??"+fdto.toString());
-		System.out.println("페이징 할때 머머 받아와??"+dto.toString());
 		dto.setTotal(service.getAdminMounuiCnt(fdto));
 		fdto.setStart(String.valueOf(dto.getStart()));
 		fdto.setLast(String.valueOf(dto.getlast()));
@@ -82,17 +73,12 @@ public class RestController_Mounui {
 		session.removeAttribute("adminMounuiBoardrow");
 		session.setAttribute("adminMounuiBoardrow", dto);
 		
-		
-		
-		
 		return json.toString();
 	}
 	
 	
 	@RequestMapping(value = "/UserMBoardPaging.do", method = RequestMethod.POST, produces = "application/text; charset=UTF-8;")
 	public String UserMBoardPaging(DTO_Paging dto,  HttpSession session){
-		
-		System.out.println("어케들어오노"+dto.toString());
 		
 		JSONObject json = null;
 		Map<String, String> map = new HashMap<String, String>();
@@ -106,12 +92,6 @@ public class RestController_Mounui {
 		session.removeAttribute("userMounuiBoardrow");
 		session.setAttribute("userMounuiBoardrow", dto);
 		
-		
 		return json.toString();
 	}
-	
-	
-	
-	
-	
 }

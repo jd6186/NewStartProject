@@ -25,9 +25,7 @@ public class intercepter extends HandlerInterceptorAdapter {
 	private IService_File file_service;
 
 	private static final String separator = File.separator; 
-	private static final String charSet = "utf-8";
 	private static final String dir = "C:"+separator+"NewStart"+separator+"img";
-	private static final int fileSize = 1024 * 1024 * 100;
 	
 	
 	
@@ -45,8 +43,6 @@ public class intercepter extends HandlerInterceptorAdapter {
 		if(report != null) {
 			
 			for (MultipartFile filereport : report) {
-				
-			
 			
 			//파일명
 			String filename  = filereport.getOriginalFilename();
@@ -66,20 +62,10 @@ public class intercepter extends HandlerInterceptorAdapter {
 			//파일 저장
 			filereport.transferTo(file);
 			
-			System.out.println("업로드한 파일은");
-			System.out.println(filename + "은 업로드한 파일이다.");
-			System.out.println(realfile + "라는 이름으로 업로드 됐다.");
-			System.out.println("파일사이즈는 " + filereport.getSize());
 			DTO_File fileDto = new DTO_File(fileboard, board_seq, realfile+originalFileExtension, filename, fileurl, extension);
 			
-			System.out.println("1111왜떠"+fileDto.toString());
 			file_service.insertFile(fileDto);
 			}
-		}else {
-			System.out.println("파일업음 뽕");
 		}
-		
-			
 	}
-	
 }
