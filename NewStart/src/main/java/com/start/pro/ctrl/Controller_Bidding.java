@@ -26,7 +26,6 @@ import com.start.pro.models.bwl.IService_BWL;
 import com.start.pro.models.chat.IService_Chat;
 import com.start.pro.models.gonggo.IService_Gonggo;
 
-
 @Controller
 public class Controller_Bidding {
 
@@ -52,8 +51,6 @@ public class Controller_Bidding {
 		String user_seq = this_user.getUser_seq();
 		model.addAttribute("gonggo_seq", gonggo_seq);
 		model.addAttribute("user_seq", user_seq);
-		System.out.println("gonggo_seq값은? : " + model.getAttribute("gonggo_seq"));
-		System.out.println("user_seq값은? : " + model.getAttribute("user_seq"));
 		return "board/gonggo/BiddingPage";
 	}
 	
@@ -61,12 +58,8 @@ public class Controller_Bidding {
 	@RequestMapping(value="/biddingInsert.do", method = RequestMethod.POST)
 	public String biddingInsert(Model model, DTO_Bidding dto, HttpSession session, String gonggo_seq) {
 		log.info("※※※※※※※※※※※※※※ 입찰 등록을 시작합니다. ※※※※※※※※※※※※ ");
-		log.info("dto, seq : \t {} {}", dto, gonggo_seq);
-		
 		boolean insert_R = service.bidding_insert(dto);
-		System.out.println("insert_R결과입니다. : " + insert_R);
 		boolean insert_U = service.bidding_update(gonggo_seq);
-		System.out.println("insert_U결과입니다. : " + insert_U);
 		return "redirect:/gonggo.do";
 	}	
 	
@@ -74,42 +67,30 @@ public class Controller_Bidding {
 	@RequestMapping(value="/getBiddingList.do", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getBiddingList(String gonggo_seq) {
-		log.info("※※※※※※※※※※※※※※ 입찰 리스트 출력을 시작합니다. ※※※※※※※※※※※※ ");
-		log.info("dto, seq : \t {} {}", gonggo_seq);
+		log.info("※※※※※※※※※※※※※※ getBiddingList을 시작합니다. ※※※※※※※※※※※※ ");
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("gonggo_seq", gonggo_seq);
 		List<DTO_Bidding> lists = service.bidding_list(map);
-		System.out.println("bidding_list결과입니다. : " + lists);
-		
 		Map<String, Object> map_L = new HashMap<String, Object>();
 		map_L.put("lists", lists);
-		System.out.println("여기서 map가지고 나갑니다~ 뿌뿌~ : " + map_L.get("lists"));
 		return map_L;
 	}	
-	
-	
-	
 
 	// /BWL_insert.do
 	@RequestMapping(value="/bwl_insert.do", method = RequestMethod.GET)
 	public String bwl_insert(HttpSession session, String gonggo_seq) {
-		System.out.println("입찰자 확정 단계에 접어들었습니다. 확정 글번호 : " + gonggo_seq);
+		log.info("※※※※※※※※※※※※※※ bwl_insert을 시작합니다. ※※※※※※※※※※※※ ");
 		String success_person = "";
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("gonggo_seq", gonggo_seq);
 		List<DTO_Bidding> B_lists = service.bidding_list(map);
-		System.out.println("bidding_list판별합니다. B_lists : " + B_lists);
 		for(int i = 0; i < B_lists.size(); i++) {
 			if(B_lists.get(i).getGonggo_seq().equalsIgnoreCase(gonggo_seq)) {
 				success_person = B_lists.get(i).getBiddinger();
 			}
 		}
-		System.out.println("success_person판별합니다. success_person : " + success_person);
 		DTO_BWL dto = new DTO_BWL(success_person, gonggo_seq);
 		boolean insert_U = service_BWL.bwl_winner(dto);
-		System.out.println("service_BWL.bwl_winner판별합니다. insert_U : " + insert_U);
-		System.out.println("insert_U결과입니다. : " + insert_U);
-		
 		DTO_User user = (DTO_User) session.getAttribute("newstart");
 		String user_seq = user.getUser_seq();
 		
@@ -121,15 +102,12 @@ public class Controller_Bidding {
 				if(chatList.get(i).getUser_seq().equalsIgnoreCase(("{"+user_seq+":"+success_person+"}")) || chatList.get(i).getUser_seq().equalsIgnoreCase(("{"+success_person+":"+user_seq+"}"))) {
 					System.out.println("chatList를 검색해본 결과 이미 한번 열린적이 있는 채팅리스트이자 채팅방입니다.");
 				} else {
-					
 					// 처음 열리는 채팅방이므로 채팅리스트와 채팅방을 동시에 등록해준다.
 					String chatUser_seq = "{"+user_seq+":"+success_person+"}";
 					DTO_ChatList dto_Chk1 = new DTO_ChatList(chatUser_seq);
 					boolean dto_chatR = chat_service.Chat_Open(dto_Chk1);
-					System.out.println("채팅리스트 등록 성공 여부 조회입니다. : " + dto_chatR);
 					if(dto_chatR) {
 						if(chatList.get(i).getUser_seq().equalsIgnoreCase(chatUser_seq)) {
-							System.out.println("chatUser_seq 통과했습니다. : " + chatUser_seq);
 							String chat_seq = chatList.get(i).getChat_seq();
 							DTO_ChatRoom resultR = new DTO_ChatRoom(chat_seq, chatUser_seq);
 							boolean result = chat_service.Chat_Content(resultR);
@@ -141,21 +119,14 @@ public class Controller_Bidding {
 				}
 			}
 		} else {
-			System.out.println("채팅방이 하나도 존재하지 않아서 여기로 접소옥~");
 			String chatUser_seq = "{"+user_seq+":"+success_person+"}";
 			DTO_ChatList dto_Chk1 = new DTO_ChatList(chatUser_seq);
 			boolean dto_chatR = chat_service.Chat_Open(dto_Chk1);
-			System.out.println("채팅리스트 등록 성공 여부 조회입니다. : " + dto_chatR);
 			List<DTO_ChatList> c_list = chat_service.Chat_List();
-			System.out.println("채팅리스트에 첫번째로 등록된 리스트의 seq를 받아봐봐 : " + c_list.get(0));
 			String chat_seq = c_list.get(0).getChat_seq();
-			System.out.println("등록된 리스트의 chat_seq : " + chat_seq);
 			DTO_ChatRoom resultR = new DTO_ChatRoom(chat_seq, chatUser_seq);
 			boolean result = chat_service.Chat_Content(resultR);
-			System.out.println(result);
 		}
-		
-		
 		return "redirect:/gonggo.do";
 	}
 	
@@ -167,7 +138,6 @@ public class Controller_Bidding {
 		log.info("dto, seq : \t {} {}", gonggo_seq);
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
 		List<DTO_BWL> lists = service_BWL.bwl_show();
-		System.out.println("bwl_show결과입니다. : " + lists);
 		boolean bwl_B = false;
 		for (int i = 0; i < lists.size(); i++) {
 			if(lists.get(i).getSuccess_person() != null) {
@@ -179,8 +149,6 @@ public class Controller_Bidding {
 		} else {
 			map.put("result", false);
 		}
-		System.out.println("여기서 map가지고 나갑니다~ 뿌뿌~ : " + map.get("result"));
 		return map;
 	}	
-	
 }
