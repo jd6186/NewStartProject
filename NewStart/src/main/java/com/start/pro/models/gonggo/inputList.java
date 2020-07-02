@@ -43,8 +43,6 @@ public class inputList {
 		return date.substring(0, date.indexOf(" "));
 	}
 
-	// TODO
-	// 관리자의 이미지 미리보기 구현 파트로 사용자들이 등록한 이미지를 디비로부터 찾아와서 연결해주면 되겠다.
 	private String titleFormat(String go_seq) {
 		StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < flists.size(); i++) {
@@ -52,10 +50,7 @@ public class inputList {
 			try {
 				if(fileDto.getFileboard().equalsIgnoreCase("2000")) {
 					if(fileDto.getBoard_seq().equalsIgnoreCase(go_seq)) {
-						System.out.println("값은 들어와" + fileDto.getFileboard() + fileDto.getBoard_seq() + fileDto.getFilename() + fileDto.getFiletype());
-						System.out.println("근데 통과도 하네?? ");
 						String url = "./img/" + fileDto.getFilename();
-						System.out.println("fUrl은? : " + url);
 						buf.append("<img src=\'" + url + "\' style='width: 100px; height:100px'>");
 					}
 				}
@@ -68,14 +63,10 @@ public class inputList {
 
 	// 출력 리스트 폼
 	private String listForm(DTO_Gonggo dto) {
-		System.out.println("inputList시작합니다. : \t{}");
-		System.out.println("DTO_Gonggo : \t{}" + dto);
-		System.out.println("DTO_User : \t{}" + users);
 		StringBuffer buf = new StringBuffer();
 
 		// colspan의 기본 user 종류별로 구분
 
-		System.out.println("유저쪽으로 유입 : \t{}" + dto);
 		int n = 7;
 		buf.append("<tr><td colspan='6'><div>");
 		buf.append("<input type='hidden' name='Gonggo_seq' id='Gonggo_seq' value='"+dto.getGonggo_seq()+"'>");
@@ -117,12 +108,9 @@ public class inputList {
 	// 리스트 가져가기
 	public String getListForm() {
 		
-		System.out.println("getListForm으로 들어오긴 합니다.");
 		StringBuffer buf = new StringBuffer();
 		
-		System.out.println("listTotal값은???" + listTotal);
 		for (int i = 0; i < lists.size(); i++) {
-			System.out.println("나가는 lists의 값은 뭔가요?" + lists);
 			buf.append(listForm(lists.get(i)));
 		}
 		return buf.toString();

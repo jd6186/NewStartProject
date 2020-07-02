@@ -53,10 +53,7 @@ public class inputListM {
 			try {
 				if(fileDto.getFileboard().equalsIgnoreCase("2000")) {
 					if(fileDto.getBoard_seq().equalsIgnoreCase(go_seq)) {
-						System.out.println("값은 들어와" + fileDto.getFileboard() + fileDto.getBoard_seq() + fileDto.getFilename() + fileDto.getFiletype());
-						System.out.println("근데 통과도 하네?? ");
 						String url = "./img/" + fileDto.getFilename();
-						System.out.println("fUrl은? : " + url);
 						buf.append("<img src=\'" + url + "\' style='width: 100px; height:100px'>");
 					}
 				}
@@ -131,11 +128,8 @@ public class inputListM {
 
 	// 리스트 가져가기
 	public String getListForm() {
-		System.out.println("getListForm으로 들어오긴 합니다.");
 		StringBuffer buf = new StringBuffer();
-		System.out.println("listTotal값은???" + listTotal);
 		for (int i = 0; i < lists.size(); i++) {
-			System.out.println("나가는 lists의 값은 뭔가요?" + lists);
 			buf.append(listForm(lists.get(i)));
 		}
 		return buf.toString();
