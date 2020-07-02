@@ -21,7 +21,7 @@ function biddingPage() {
         	 alert("공고 작성이 완료되었습니다.");
         	 return true;
          } else {
-        	 alert("결제 해 병신아!!ㅗㅗㅗㅗㅗㅗㅗㅗ");
+        	 alert("결제 해주세요");
         	 location.href="./pay.do";
          }
       },
@@ -46,7 +46,7 @@ function biddingM(val){
         	 alert("공고 작성이 완료되었습니다.");
         	 return true;
          } else {
-        	 alert("결제 해 병신아!!ㅗㅗㅗㅗㅗㅗㅗㅗ");
+        	 alert("결제 해주세요");
         	 location.href="./pay.do";
          }
       },

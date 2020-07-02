@@ -9,7 +9,7 @@ function CreditUseing(){
          if(data == "true"){
         	 alert("공고 작성이 완료되었습니다.");
          } else {
-        	 alert("결제 해 병신아!!ㅗㅗㅗㅗㅗㅗㅗㅗ");
+        	 alert("결제 해주세요");
         	 location.href="./pay.do";
          }
       },

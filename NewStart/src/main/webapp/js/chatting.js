@@ -6,7 +6,6 @@ function chatListOpen(){
 		dataType:"json",
 		data:{"gonggo_seq":""},
 		success:function(map_L){
-			alert("기능작동 시작합니다.");
 			var list = map_L.chatRoom_list;
 			html = "<div style='width:300px; height:600px; position:absolute; left:50%; top:50%; margin-left:-150px; margin-top:-150px;'>"
 			html = "<button id='exit'>채팅방 나가기</button>"
