@@ -85,15 +85,11 @@
 	
 	<!-- 로그인 성공 핸들러 -->
 	<bean id="loginSuccessHandler" class="com.start.pro.security.Sc_LoginSuccessHandler">
-		<property name="loginidname" value="username"/>
 		<property name="defaultUrl" value="/loginResult.do"/>
 	</bean> 
 	
 	<!-- 로그인 실패 핸들러 -->
 	<bean id="loginFailureHandler" class="com.start.pro.security.Sc_LoginFailureHandler">
-		<property name="loginidname" value="username"/>
-    	<property name="loginpwdname" value="password"/>
-		<property name="errormsgname" value="ERRORMSG"/>
     	<property name="defaultFailureUrl" value="/loginForm.do?error"/>
 	</bean>
 
@@ -112,24 +108,24 @@
 		<constructor-arg ref="messageSource"/>
 	</bean>
 	
-	<bean class="com.start.pro.util.Util_Message" id="messageUtils"/>
+	<!-- <bean class="com.start.pro.util.Util_Message" id="messageUtils"/> -->
 
 	<!-- 메일 보내기 설정 -->
-	   <bean 
-      class="org.springframework.mail.javamail.JavaMailSenderImpl">
-      <property name="host" value="smtp.gmail.com" />
-      <property name="port" value="587" />
-      <property name="username" value="ckadl0118@gmail.com" />
-      <property name="password" value="snfl29336313!" />
-      <property name="javaMailProperties">
-         <props>
-            <prop key="main.debug">true</prop>
-            <prop key="mail.smtp.auth">true</prop>
-            <prop key="mail.transport.protocol">smtp</prop>
-            <prop key="mail.smtp.starttls.enable">true</prop>
-         </props>
-      </property>
-   </bean>
+	<bean 
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="ckadl0118@gmail.com" />
+		<property name="password" value="snfl29336313!" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="main.debug">true</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
 	
 	
 	<security:authentication-manager>
